@@ -1,5 +1,5 @@
-export GIT_USER_NAME="jm1021"
-export GIT_USER_EMAIL="jmort1021@gmail.com"
+export GIT_USER_NAME="yasna459"
+export GIT_USER_EMAIL="yasnarts@gmail.com"
 
 # Function to check if a line exists in run commands
 line_exists_in_rc() {
