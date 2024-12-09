@@ -8,7 +8,7 @@ hide: true
 I'm Yasna Ahmadi, a freshman at Del Norte High School. I love to bake, cook, draw, and play tennis. My favorite color is lavender or navy blue. 
 
 <div style="display: flex; justify-content: space-evenly;">
-  <img src="images/image-removebg-preview.png" alt="alt text" style="width:30%; margin-right: 10px;">
-  <img src="image.png" alt="alt text" style="width:30%; margin-right: 10px;">
-  <img src="image-2.png" alt="alt text" style="width:30%;">
+  <img src="images/image-removebg-preview.png" alt="alt text" style="width:30%;">
+  <img src="image.png" alt="alt text" style="width:30%;">
+  <img src="image-2.png" alt="alt text" style="width:20%; margin-left: 10px;">
 </div>
