@@ -23,3 +23,17 @@ permalink: /about/
     cursor: pointer;">
   My favorite show!
 </a>
+
+<a href="https://www.disneyplus.com/browse/entity-46af23cb-79bc-4e57-90c0-1fc9661f8afe" style="
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #B284BE;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;">
+  My favorite movie!
+</a>
