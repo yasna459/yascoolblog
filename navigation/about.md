@@ -19,5 +19,5 @@ permalink: /about/
 <h2>Favorite Movie (click the picture!)</h2>
 <!-- Link to the favorite movie -->
 <a href="https://www.disneyplus.com/browse/entity-46af23cb-79bc-4e57-90c0-1fc9661f8afe" style="text-decoration: none;">
-  <img src="https://i.imgur.com/TmVKEXX.jpeg" style="width: 300px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
+  <img src="https://i.imgur.com/TmVKEXX.jpeg" style="width: 150px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
 </a>
