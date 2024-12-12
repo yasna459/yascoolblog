@@ -26,5 +26,5 @@ permalink: /about/
 <h3>Favorite Game (click the picture!)</h3>
 <!-- Link to the favorite movie -->
 <a href="https://www.youtube.com/watch?v=gvECQlxrhbw" style="text-decoration: none;">
-  <img src="https://imgur.com/dPugbdK" style="width: 150px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
+  <img src="https://i.imgur.com/dPugbdK.png" style="width: 150px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
 </a>
