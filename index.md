@@ -23,5 +23,20 @@ I'm Yasna Ahmadi, a freshman at Del Norte High School. I love to bake, cook, dra
 <a href="https://github.com/yasna459/yascoolblog" style="text-decoration: none;">
 </a>
 
+<h3>Notebook</h3>
+<a href="_notebooks/Foundation/B-tools_and_equipment/2023-08-22-devops_tools-verify.ipynb" 
+   download
+   style="
+     display: inline-block;
+     padding: 10px 20px;
+     font-size: 16px;
+     color: white;
+     background-color: #007BFF;
+     border: none;
+     border-radius: 5px;
+     text-decoration: none;
+     text-align: center;
+     cursor: pointer;">
+</a>
 
 
