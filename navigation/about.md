@@ -9,15 +9,22 @@ permalink: /about/
 - Went to preschool at University Child Development Center and elementary/middle school at Metrolina Regional Scholars Academy in Charlotte, NC.
 - Moved to San Diego, California on July 1st, 2024.
 
-<h3>Favorite Show (click the picture!)</h3>
+<h3>Favorite Show (click the picture!)</h3>    
 <!-- Link to the favorite show -->
 <a href="https://www.disneyplus.com/browse/entity-95ffc9f8-bb94-486c-b2bb-8a817f326b51?distributionPartner=google" style="text-decoration: none;">
   <img src="https://i.imgur.com/Ah97P2E.jpeg" style="width: 300px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
 </a>
 
 
+
 <h3>Favorite Movie (click the picture!)</h3>
 <!-- Link to the favorite movie -->
 <a href="https://www.disneyplus.com/browse/entity-46af23cb-79bc-4e57-90c0-1fc9661f8afe" style="text-decoration: none;">
   <img src="https://i.imgur.com/TmVKEXX.jpeg" style="width: 150px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
+</a>
+
+<h3>Favorite Game (click the picture!)</h3>
+<!-- Link to the favorite movie -->
+<a href="https://www.youtube.com/watch?v=gvECQlxrhbw" style="text-decoration: none;">
+  <img src="https://imgur.com/dPugbdK" style="width: 150px; height: auto; border-radius: 10px; display: block; margin: 0 auto;">
 </a>
