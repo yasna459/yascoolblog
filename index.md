@@ -13,10 +13,6 @@ I'm Yasna Ahmadi, a freshman at Del Norte High School. I love to bake, cook, dra
   <img src="images/navy blue pantone.png" alt="alt text" style="width:30%; height:auto;">
 </div>
 
-<h3>Notebook</h3>
-<!-- Link to the favorite movie -->
-<a href="https://github.com/yasna459/yascoolblog/blob/main/_notebooks/Foundation/B-tools_and_equipment/2023-08-22-devops_tools-verify.ipynb" style="text-decoration: none;">
-</a>
 
 <h3>Github</h3>
 <!-- Link to the favorite movie -->
@@ -24,19 +20,6 @@ I'm Yasna Ahmadi, a freshman at Del Norte High School. I love to bake, cook, dra
 </a>
 
 <h3>Notebook</h3>
-<a href="_notebooks/Foundation/B-tools_and_equipment/2023-08-22-devops_tools-verify.ipynb" 
-   download
-   style="
-     display: inline-block;
-     padding: 10px 20px;
-     font-size: 16px;
-     color: white;
-     background-color: #007BFF;
-     border: none;
-     border-radius: 5px;
-     text-decoration: none;
-     text-align: center;
-     cursor: pointer;">
-</a>
+<a href="https://yasna459.github.io/yascoolblog/devops/tools/verify" style="text-decoration: none;">
 
 
