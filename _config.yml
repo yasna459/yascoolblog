@@ -17,6 +17,23 @@ remote_theme: pages-themes/cayman@v0.2.0
 # remote_theme: pages-themes/dinky@v0.2.0
 # remote_theme: pages-themes/minimal@v0.2.0
 # remote_theme: pages-themes/time-machine@v0.2.0
+
+/* Update body background to a soft pastel pink */
+body {
+    background-color: #ffeef8; /* soft pink */
+}
+
+/* Make headings a soft pink */
+h1, h2, h3 {
+    color: #ff80bf; /* soft pink */
+}
+
+/* Pink links */
+a {
+    color: #ff3399; /* bright pink */
+}
+
+
 plugins:
   - jekyll-remote-theme
 header_pages:
