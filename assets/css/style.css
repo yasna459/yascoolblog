@@ -5,7 +5,7 @@ body {
   
   /* Change heading colors to soft pink */
   h1, h2, h3, h4, h5, h6 {
-    color: #ff80bf; /* soft pink */
+    color: #ffb5da; /* soft pink */
   }
   
   /* Change links to bright pink */
@@ -19,7 +19,7 @@ body {
   
   /* Modify footer background and text color */
   .site-footer {
-    background-color: #ff80bf; /* soft pink */
+    background-color: #ffb5da; /* soft pink */
     color: white;
   }
   
@@ -46,14 +46,14 @@ body {
   }
   
   .btn:active {
-    background-color: #ff80bf; /* lighter pink on click */
+    background-color: #ffb5da; /* lighter pink on click */
     color: white;
-    border-color: #ff80bf;
+    border-color: #ffb5da;
   }
   
   /* Page header to be pink */
   .page-header {
-    background-color: #ff80bf; /* soft pink */
+    background-color: #ffb5da; /* soft pink */
     color: white;
     text-align: center;
   }
@@ -69,7 +69,7 @@ body {
     position: fixed;
     top: 10px;
     left: 10px;
-    background-color: #ff80bf;
+    background-color: #ffb5da;
     color: white;
     padding: 10px;
     border-radius: 5px;
