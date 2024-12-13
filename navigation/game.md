@@ -145,6 +145,14 @@ permalink: /game/
     let score;
     let wall;
 
+    // Image Objects for Snake and Food
+    const snakeImage = new Image();
+    const foodImage = new Image();
+
+    // Load images
+    snakeImage.src = "snake.png";  // Replace with your snake image URL
+    foodImage.src = "food.png";    // Replace with your food image URL
+
     // Display Control
     let showScreen = function(screen_opt){
         SCREEN = screen_opt;
@@ -262,15 +270,13 @@ permalink: /game/
         // Game Draw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Snake body
+        // Draw Snake with Image
         snake.forEach(function(segment) {
-            ctx.fillStyle = "green"; // Temporarily using green color for snake
-            ctx.fillRect(segment.x * BLOCK, segment.y * BLOCK, BLOCK, BLOCK);
+            ctx.drawImage(snakeImage, segment.x * BLOCK, segment.y * BLOCK, BLOCK, BLOCK);
         });
 
-        // Food
-        ctx.fillStyle = "red"; // Temporarily using red color for food
-        ctx.fillRect(food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
+        // Draw Food with Image
+        ctx.drawImage(foodImage, food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
     };
 
     // New Game
@@ -304,3 +310,4 @@ permalink: /game/
     }
 })();
 </script>
+ 
