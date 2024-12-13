@@ -25,14 +25,30 @@ body {
   
   /* Adjust button style */
   .btn {
-    color: rgba(255, 255, 255, 0.7);
-    background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 10px 20px;
+    color: white;
+    background-color: #ff3399; /* bright pink */
+    border: 2px solid #ff3399;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
   }
   
   .btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    background-color: white;
+    color: #ff3399;
+    border-color: #ff3399;
+    text-decoration: none;
+  }
+  
+  .btn:active {
+    background-color: #ff80bf; /* lighter pink on click */
+    color: white;
+    border-color: #ff80bf;
   }
   
   /* Page header to be pink */
@@ -40,5 +56,24 @@ body {
     background-color: #ff80bf; /* soft pink */
     color: white;
     text-align: center;
+  }
+  
+  /* Hide the skip-to-content link visually but keep it accessible */
+  #skip-to-content {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  #skip-to-content:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: #ff80bf;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    z-index: 9999;
   }
   
