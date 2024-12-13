@@ -132,6 +132,15 @@ permalink: /game/
         snakeImg.src = "images/snake.png";  // Change this to your own snake image file path
         foodImg.src = "images/food.png";  // Change this to your own food image file path
         
+        // Wait for images to load before starting the game
+        let imagesLoaded = 0;
+        snakeImg.onload = foodImg.onload = function() {
+            imagesLoaded++;
+            if (imagesLoaded === 2) {
+                newGame();
+            }
+        };
+
         // HTML Game IDs
         const SCREEN_SNAKE = 0;
         const screen_snake = document.getElementById("snake");
@@ -312,4 +321,3 @@ permalink: /game/
 
     })();
 </script>
-
