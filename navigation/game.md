@@ -131,8 +131,8 @@ permalink: /game/
         const foodImg = new Image();
         const snakeImg = new Image();
 
-        foodImg.src = "/assets/images/food.png"; // Replace with your image path
-        snakeImg.src = "/assets/images/snake.png"; // Replace with your image path
+        foodImg.src = "images/food.png"; // Replace with your image path
+        snakeImg.src = "images/snake.png"; // Replace with your image path
 
         const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
         let SCREEN = SCREEN_MENU;
