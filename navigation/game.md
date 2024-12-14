@@ -1,115 +1,3 @@
----
-layout: page
-title: Game
-permalink: /game/
----
-
-<style>
-    body{
-    }
-    .wrap{
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    canvas{
-        display: block;
-        border-style: solid;
-        border-width: 10px;
-        border-color: #FFFFFF;
-    }
-    canvas:focus{
-        outline: none;
-    }
-
-    /* All screens style */
-    #gameover p, #setting p, #menu p{
-        font-size: 20px;
-    }
-
-    #gameover a, #setting a, #menu a{
-        font-size: 30px;
-        display: block;
-    }
-
-    #gameover a:hover, #setting a:hover, #menu a:hover{
-        cursor: pointer;
-    }
-
-    #gameover a:hover::before, #setting a:hover::before, #menu a:hover::before{
-        content: ">";
-        margin-right: 10px;
-    }
-
-    #menu{
-        display: block;
-    }
-
-    #gameover{
-        display: none;
-    }
-
-    #setting{
-        display: none;
-    }
-
-    #setting input{
-        display:none;
-    }
-
-    #setting label{
-        cursor: pointer;
-    }
-
-    #setting input:checked + label{
-        background-color: #FFF;
-        color: #000;
-    }
-</style>
-
-<h2>Snake</h2>
-<div class="container">
-    <header class="pb-3 mb-4 border-bottom border-primary text-dark">
-        <p class="fs-4">Score: <span id="score_value">0</span></p>
-    </header>
-    <div class="container bg-secondary" style="text-align:center;">
-        <!-- Main Menu -->
-        <div id="menu" class="py-4 text-light">
-            <p>Welcome to Snake, press <span style="background-color: #FFFFFF; color: #000000">space</span> to begin</p>
-            <a id="new_game" class="link-alert">new game</a>
-            <a id="setting_menu" class="link-alert">settings</a>
-        </div>
-        <!-- Game Over -->
-        <div id="gameover" class="py-4 text-light">
-            <p>Game Over, press <span style="background-color: #FFFFFF; color: #000000">space</span> to try again</p>
-            <a id="new_game1" class="link-alert">new game</a>
-            <a id="setting_menu1" class="link-alert">settings</a>
-        </div>
-        <!-- Play Screen -->
-        <canvas id="snake" class="wrap" width="320" height="320" tabindex="1"></canvas>
-        <!-- Settings Screen -->
-        <div id="setting" class="py-4 text-light">
-            <p>Settings Screen, press <span style="background-color: #FFFFFF; color: #000000">space</span> to go back to playing</p>
-            <a id="new_game2" class="link-alert">new game</a>
-            <br>
-            <p>Speed:
-                <input id="speed1" type="radio" name="speed" value="120" checked/>
-                <label for="speed1">Slow</label>
-                <input id="speed2" type="radio" name="speed" value="75"/>
-                <label for="speed2">Normal</label>
-                <input id="speed3" type="radio" name="speed" value="35"/>
-                <label for="speed3">Fast</label>
-            </p>
-            <p>Wall:
-                <input id="wallon" type="radio" name="wall" value="1" checked/>
-                <label for="wallon">On</label>
-                <input id="walloff" type="radio" name="wall" value="0"/>
-                <label for="walloff">Off</label>
-            </p>
-        </div>
-    </div>
-</div>
-
 <script>
 (function(){
     // Canvas & Context
@@ -137,13 +25,14 @@ permalink: /game/
     // Game Control
     const BLOCK = 20;   // Set a larger block size to make things visible
     let SCREEN = SCREEN_MENU;
-    let snake;
-    let snake_dir;
-    let snake_next_dir;
-    let snake_speed;
+    let snake = [];
+    let snake_dir = 1;
+    let snake_next_dir = 1;
+    let snake_speed = 150;
     let food = {x: 0, y: 0};
-    let score;
-    let wall;
+    let score = 0;
+    let wall = 1;
+    let intervalId;
 
     // Image Objects for Snake and Food
     const snakeImage = new Image();
@@ -154,7 +43,7 @@ permalink: /game/
     foodImage.src = "food.png";    // Replace with your food image URL
 
     // Display Control
-    let showScreen = function(screen_opt){
+    const showScreen = (screen_opt) => {
         SCREEN = screen_opt;
         switch(screen_opt){
             case SCREEN_MENU:
@@ -173,7 +62,7 @@ permalink: /game/
                 screen_setting.style.display = "block";
                 break;
         }
-    }
+    };
 
     // Actions and Events
     window.onload = function(){
@@ -184,36 +73,30 @@ permalink: /game/
         button_setting_menu1.onclick = function(){showScreen(SCREEN_SETTING);};
 
         // Speed and wall settings
-        setSnakeSpeed(150);
-        for(let i = 0; i < speed_setting.length; i++){
-            speed_setting[i].addEventListener("click", function(){
-                for(let i = 0; i < speed_setting.length; i++){
-                    if(speed_setting[i].checked){
-                        setSnakeSpeed(speed_setting[i].value);
-                    }
+        for (let i = 0; i < speed_setting.length; i++) {
+            speed_setting[i].addEventListener("click", function () {
+                if (speed_setting[i].checked) {
+                    setSnakeSpeed(speed_setting[i].value);
                 }
             });
         }
 
-        setWall(1);
-        for(let i = 0; i < wall_setting.length; i++){
-            wall_setting[i].addEventListener("click", function(){
-                for(let i = 0; i < wall_setting.length; i++){
-                    if(wall_setting[i].checked){
-                        setWall(wall_setting[i].value);
-                    }
+        for (let i = 0; i < wall_setting.length; i++) {
+            wall_setting[i].addEventListener("click", function () {
+                if (wall_setting[i].checked) {
+                    setWall(wall_setting[i].value);
                 }
             });
         }
 
         window.addEventListener("keydown", function(evt) {
-            if(evt.code === "Space" && SCREEN !== SCREEN_MENU)
+            if(evt.code === "Space" && SCREEN === SCREEN_MENU)
                 newGame();
         }, true);
-    }
+    };
 
     // Game Loop
-    let mainLoop = function(){
+    const mainLoop = () => {
         let _x = snake[0].x;
         let _y = snake[0].y;
         snake_dir = snake_next_dir;
@@ -226,87 +109,88 @@ permalink: /game/
             case 3: _x--; break;
         }
 
-        snake.pop();
-        snake.unshift({x: _x, y: _y});
+        // Add new head to the snake
+        const newHead = {x: _x, y: _y};
 
-        if(wall === 1){
-            if (snake[0].x < 0 || snake[0].x === canvas.width / BLOCK || snake[0].y < 0 || snake[0].y === canvas.height / BLOCK){
-                showScreen(SCREEN_GAME_OVER);
+        // Check wall collisions
+        if (wall === 1) {
+            if (_x < 0 || _x >= canvas.width / BLOCK || _y < 0 || _y >= canvas.height / BLOCK) {
+                gameOver();
                 return;
             }
-        }else{
-            for(let i = 0; i < snake.length; i++){
-                if(snake[i].x < 0){
-                    snake[i].x = snake[i].x + (canvas.width / BLOCK);
-                }
-                if(snake[i].x === canvas.width / BLOCK){
-                    snake[i].x = snake[i].x - (canvas.width / BLOCK);
-                }
-                if(snake[i].y < 0){
-                    snake[i].y = snake[i].y + (canvas.height / BLOCK);
-                }
-                if(snake[i].y === canvas.height / BLOCK){
-                    snake[i].y = snake[i].y - (canvas.height / BLOCK);
-                }
-            }
+        } else {
+            if (_x < 0) newHead.x = canvas.width / BLOCK - 1;
+            if (_x >= canvas.width / BLOCK) newHead.x = 0;
+            if (_y < 0) newHead.y = canvas.height / BLOCK - 1;
+            if (_y >= canvas.height / BLOCK) newHead.y = 0;
         }
 
-        // Check Snake Collision
-        for(let i = 1; i < snake.length; i++){
-            if (snake[0].x === snake[i].x && snake[0].y === snake[i].y){
-                showScreen(SCREEN_GAME_OVER);
+        // Check for self-collision
+        for (let i = 0; i < snake.length; i++) {
+            if (snake[i].x === newHead.x && snake[i].y === newHead.y) {
+                gameOver();
                 return;
             }
         }
 
-        // Check if Snake Eats Food
-        if(snake[0].x === food.x && snake[0].y === food.y){
-            snake.push({x: food.x, y: food.y});
+        // Add new head to snake
+        snake.unshift(newHead);
+
+        // Check if food is eaten
+        if (newHead.x === food.x && newHead.y === food.y) {
             score++;
             ele_score.innerHTML = score;
             addFood();
+        } else {
+            snake.pop();
         }
 
-        // Game Draw
+        // Draw the game
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Snake with Image
-        snake.forEach(function(segment) {
-            ctx.drawImage(snakeImage, segment.x * BLOCK, segment.y * BLOCK, BLOCK, BLOCK);
-        });
-
-        // Draw Food with Image
+        // Draw food
         ctx.drawImage(foodImage, food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
+
+        // Draw snake
+        for (let i = 0; i < snake.length; i++) {
+            ctx.drawImage(snakeImage, snake[i].x * BLOCK, snake[i].y * BLOCK, BLOCK, BLOCK);
+        }
     };
 
-    // New Game
-    function newGame(){
-        showScreen(SCREEN_MENU);
-        snake = [];
+    // Start a new game
+    const newGame = () => {
+        clearInterval(intervalId);
+        snake = [{x: 5, y: 5}];
         snake_next_dir = 1;
-        snake_dir = 1;
         score = 0;
         ele_score.innerHTML = score;
         addFood();
-        snake.push({x: 10, y: 10});
-        setInterval(mainLoop, snake_speed);
-    }
+        intervalId = setInterval(mainLoop, snake_speed);
+        showScreen(SCREEN_MENU);
+    };
 
-    // Add Random Food
-    function addFood(){
-        let _food_x = Math.floor(Math.random() * (canvas.width / BLOCK));
-        let _food_y = Math.floor(Math.random() * (canvas.height / BLOCK));
-        food = {x: _food_x, y: _food_y};
-    }
+    // Add random food
+    const addFood = () => {
+        food = {
+            x: Math.floor(Math.random() * (canvas.width / BLOCK)),
+            y: Math.floor(Math.random() * (canvas.height / BLOCK)),
+        };
+    };
 
-    // Set Speed
-    function setSnakeSpeed(speed){
-        snake_speed = speed;
-    }
+    // Set speed
+    const setSnakeSpeed = (speed) => {
+        snake_speed = parseInt(speed);
+    };
 
-    // Set Wall
-    function setWall(wallOpt){
+    // Set wall mode
+    const setWall = (wallOpt) => {
         wall = parseInt(wallOpt);
-    }
+    };
+
+    // Game over
+    const gameOver = () => {
+        clearInterval(intervalId);
+        showScreen(SCREEN_GAME_OVER);
+    };
 })();
 </script>
