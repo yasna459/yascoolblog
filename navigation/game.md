@@ -126,19 +126,23 @@ permalink: /game/
     (function () {
         const canvas = document.getElementById("snake");
         const ctx = canvas.getContext("2d");
-        const BLOCK = 10;
+
+        // Block size of 40 and canvas size 480x480
+        const BLOCK = 40;
+        canvas.width = 480;
+        canvas.height = 480;
 
         const foodImg = new Image();
         const snakeImg = new Image();
 
-        foodImg.src = "images/food.png"; // Replace with your image path
-        snakeImg.src = "images/snake.png"; // Replace with your image path
+        foodImg.src = "https://github.com/user-attachments/assets/ae4f1042-2f90-4932-a425-d9e35c133457"; 
+        snakeImg.src = "https://github.com/user-attachments/assets/b2be2453-cb6b-4274-87c7-aa1cf1017afd"; 
 
         const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
         let SCREEN = SCREEN_MENU;
 
         const snake = [];
-        let snakeDir = 1, nextDir = 1, snakeSpeed = 150, wall = 1, score = 0, food = { x: 0, y: 0 };
+        let snakeDir = 1, nextDir = 1, snakeSpeed = 120, wall = 1, score = 0, food = { x: 0, y: 0 };
 
         const screens = {
             menu: document.getElementById("menu"),
@@ -167,7 +171,7 @@ permalink: /game/
             renderScreen(SCREEN_SNAKE);
             score = 0;
             snake.length = 0;
-            snake.push({ x: 0, y: 15 });
+            snake.push({ x: 5, y: 5 }); // Start snake at a valid position
             nextDir = 1;
             placeFood();
             loop();
@@ -184,11 +188,21 @@ permalink: /game/
                 case 3: head.x--; break;
             }
 
+            // Check for collisions with walls (only if wall is enabled)
             if (wall === 1 && (head.x < 0 || head.x >= canvas.width / BLOCK || head.y < 0 || head.y >= canvas.height / BLOCK)) {
                 renderScreen(SCREEN_GAME_OVER);
                 return;
             }
 
+            // If wall is off, allow snake to wrap around
+            if (wall === 0) {
+                if (head.x < 0) head.x = canvas.width / BLOCK - 1;
+                if (head.x >= canvas.width / BLOCK) head.x = 0;
+                if (head.y < 0) head.y = canvas.height / BLOCK - 1;
+                if (head.y >= canvas.height / BLOCK) head.y = 0;
+            }
+
+            // Check for collisions with snake itself
             if (snake.some(part => part.x === head.x && part.y === head.y)) {
                 renderScreen(SCREEN_GAME_OVER);
                 return;
@@ -196,6 +210,7 @@ permalink: /game/
 
             snake.unshift(head);
 
+            // Check if snake eats food
             if (head.x === food.x && head.y === food.y) {
                 score++;
                 placeFood();
@@ -208,9 +223,14 @@ permalink: /game/
             ctx.fillStyle = "#f8d7f1";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Draw the snake and food using the updated block size
             snake.forEach(part => ctx.drawImage(snakeImg, part.x * BLOCK, part.y * BLOCK, BLOCK, BLOCK));
             ctx.drawImage(foodImg, food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
 
+            // Update the score on the screen
+            document.getElementById("score_value").textContent = score;
+
+            // Call the loop recursively
             setTimeout(loop, snakeSpeed);
         }
 
@@ -224,10 +244,30 @@ permalink: /game/
             buttons.setting.forEach(btn => btn.onclick = () => renderScreen(SCREEN_SETTING));
             renderScreen(SCREEN_MENU);
 
+            // Handle key events for movement and starting the game
             document.addEventListener("keydown", e => {
                 if (e.code === "Space" && SCREEN !== SCREEN_SNAKE) newGame();
                 if (e.keyCode >= 37 && e.keyCode <= 40) nextDir = [3, 0, 1, 2][e.keyCode - 37];
             });
+
+            // Speed settings
+            document.getElementById("speed1").onclick = () => {
+                snakeSpeed = 120; // Slow
+            };
+            document.getElementById("speed2").onclick = () => {
+                snakeSpeed = 75; // Normal
+            };
+            document.getElementById("speed3").onclick = () => {
+                snakeSpeed = 35; // Fast
+            };
+
+            // Wall setting
+            document.getElementById("wallon").onclick = () => {
+                wall = 1; // Wall On
+            };
+            document.getElementById("walloff").onclick = () => {
+                wall = 0; // Wall Off
+            };
         };
     })();
 </script>
