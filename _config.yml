@@ -16,4 +16,4 @@ header_pages:
   - navigation/game.md
 
 head:
-  - "<link rel='stylesheet' href='/assets/css/style.css'>"
+  - "<link rel='stylesheet' href='/_sass/jekyll-theme-cayman.scss'>"
