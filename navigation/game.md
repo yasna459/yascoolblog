@@ -105,12 +105,20 @@ permalink: /game/
             <p>Settings Screen, press <span style="background-color: #FFFFFF; color: #000000">space</span> to go back to playing</p>
             <a id="new_game2">New Game</a>
             <p>Speed:
-                <input id="speed1" type="radio" name="speed" value="120" checked />
+                <input id="speed1" type="radio" name="speed" value="200" checked />
                 <label for="speed1">Slow</label>
                 <input id="speed2" type="radio" name="speed" value="75" />
                 <label for="speed2">Normal</label>
                 <input id="speed3" type="radio" name="speed" value="35" />
                 <label for="speed3">Fast</label>
+            </p>
+            <p>Block Size:
+                <input id="size_tiny" type="radio" name="size" value="20" />
+                <label for="size_tiny">Tiny</label>
+                <input id="size_normal" type="radio" name="size" value="35" checked />
+                <label for="size_normal">Normal</label>
+                <input id="size_big" type="radio" name="size" value="45" />
+                <label for="size_big">Big</label>
             </p>
             <p>Wall:
                 <input id="wallon" type="radio" name="wall" value="1" checked />
@@ -127,16 +135,16 @@ permalink: /game/
         const canvas = document.getElementById("snake");
         const ctx = canvas.getContext("2d");
 
-        // Block size of 40 and canvas size 480x480
-        const BLOCK = 40;
-        canvas.width = 480;
-        canvas.height = 480;
+        // Initial block size and canvas dimensions
+        let BLOCK = 40;
+        canvas.width = 640;
+        canvas.height = 640;
 
         const foodImg = new Image();
         const snakeImg = new Image();
 
-        foodImg.src = "https://github.com/user-attachments/assets/25d14cb0-83ad-41d7-a82e-5127f011f92d"; 
-        snakeImg.src = "https://github.com/user-attachments/assets/b2be2453-cb6b-4274-87c7-aa1cf1017afd"; 
+        foodImg.src = "https://github.com/user-attachments/assets/fdce7e8e-7bac-41fb-9962-defcc59b0383"; 
+        snakeImg.src = "https://github.com/user-attachments/assets/d116a0ed-d320-43db-bd4f-6b45275a0243"; 
 
         const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
         let SCREEN = SCREEN_MENU;
@@ -239,9 +247,27 @@ permalink: /game/
             food.y = Math.floor(Math.random() * canvas.height / BLOCK);
         }
 
+        function setBlockSize(newSize) {
+            BLOCK = newSize;
+
+            // Resize the canvas dynamically to fit the new block size
+            const gridWidth = Math.floor(640 / BLOCK) * BLOCK;
+            canvas.width = gridWidth;
+            canvas.height = gridWidth;
+
+            newGame(); // Restart the game to apply changes
+        }
+
         window.onload = function () {
+            // Set up the new game buttons
             buttons.newGame.forEach(btn => btn.onclick = newGame);
+            // Set up the settings menu buttons
             buttons.setting.forEach(btn => btn.onclick = () => renderScreen(SCREEN_SETTING));
+            // Add event listeners for block size changes
+            document.getElementById("size_tiny").onclick = () => setBlockSize(20);
+            document.getElementById("size_normal").onclick = () => setBlockSize(35);
+            document.getElementById("size_big").onclick = () => setBlockSize(45);
+            // Initial screen render (show the menu)
             renderScreen(SCREEN_MENU);
 
             // Handle key events for movement and starting the game
