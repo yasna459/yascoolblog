@@ -252,7 +252,7 @@ permalink: /game/
 
             // Speed settings
             document.getElementById("speed1").onclick = () => {
-                snakeSpeed = 120; // Slow
+                snakeSpeed = 175; // Slow
             };
             document.getElementById("speed2").onclick = () => {
                 snakeSpeed = 75; // Normal
