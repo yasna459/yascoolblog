@@ -119,7 +119,7 @@ permalink: /game/
                 <label for="size_tiny">Tiny</label>
                 <input id="size_normal" type="radio" name="size" value="35" checked />
                 <label for="size_normal">Normal</label>
-                <input id="size_big" type="radio" name="size" value="45" />
+                <input id="size_big" type="radio" name="size" value="48" />
                 <label for="size_big">Big</label>
             </p>
             <p>Wall:
@@ -296,6 +296,22 @@ permalink: /game/
         };
         document.getElementById("walloff").onclick = () => {
             wall = 0; // Wall Off
+        };
+        // Block Size Settings
+        document.getElementById("size_tiny").onclick = () => {
+        BLOCK = 20; // Tiny block size
+        canvas.width = 640; // Adjust canvas size
+        canvas.height = 640;
+        };
+        document.getElementById("size_normal").onclick = () => {
+        BLOCK = 35; // Normal block size
+        canvas.width = 640; // Adjust canvas size
+        canvas.height = 640;
+        };
+        document.getElementById("size_big").onclick = () => {
+        BLOCK = 48; // Big block size
+        canvas.width = 640; // Adjust canvas size
+        canvas.height = 640;
         };
     };
 })();
