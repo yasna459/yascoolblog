@@ -135,7 +135,7 @@ permalink: /game/
         const foodImg = new Image();
         const snakeImg = new Image();
 
-        foodImg.src = "https://github.com/user-attachments/assets/ae4f1042-2f90-4932-a425-d9e35c133457"; 
+        foodImg.src = "https://github.com/user-attachments/assets/25d14cb0-83ad-41d7-a82e-5127f011f92d"; 
         snakeImg.src = "https://github.com/user-attachments/assets/b2be2453-cb6b-4274-87c7-aa1cf1017afd"; 
 
         const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
