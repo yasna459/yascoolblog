@@ -84,6 +84,7 @@ permalink: /game/
 <div class="container">
     <header class="pb-3 mb-4 border-bottom border-primary text-dark">
         <p class="fs-4">Score: <span id="score_value">0</span></p>
+         <p class="fs-4"> <span id="high_score_value">0</span></p> <!-- Add high score display here -->
     </header>
     <div class="container bg-secondary" style="text-align: center;">
         <!-- Main Menu -->
@@ -95,6 +96,7 @@ permalink: /game/
         <!-- Game Over -->
         <div id="gameover" class="py-4 text-light">
             <p>Game Over, press <span style="background-color: #FFFFFF; color: #000000">space</span> to try again</p>
+            <p id="high_score_value"> High Score: 0</p> <!-- Added high score display here -->
             <a id="new_game1">New Game</a>
             <a id="setting_menu1">Settings</a>
         </div>
@@ -131,169 +133,170 @@ permalink: /game/
 </div>
 
 <script>
-    (function () {
-        const canvas = document.getElementById("snake");
-        const ctx = canvas.getContext("2d");
+(function () {
+    const canvas = document.getElementById("snake");
+    const ctx = canvas.getContext("2d");
 
-        // Initial block size and canvas dimensions
-        let BLOCK = 40;
-        canvas.width = 640;
-        canvas.height = 640;
+    // Initial block size and canvas dimensions
+    let BLOCK = 40;
+    canvas.width = 640;
+    canvas.height = 640;
 
-        const foodImg = new Image();
-        const snakeImg = new Image();
+    const foodImg = new Image();
+    const snakeImg = new Image();
 
-        foodImg.src = "https://github.com/user-attachments/assets/fdce7e8e-7bac-41fb-9962-defcc59b0383"; 
-        snakeImg.src = "https://github.com/user-attachments/assets/d116a0ed-d320-43db-bd4f-6b45275a0243"; 
+    foodImg.src = "https://github.com/user-attachments/assets/25d14cb0-83ad-41d7-a82e-5127f011f92d"; 
+    snakeImg.src = "https://github.com/user-attachments/assets/d116a0ed-d320-43db-bd4f-6b45275a0243"; 
 
-        const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
-        let SCREEN = SCREEN_MENU;
+    const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SETTING = 2, SCREEN_SNAKE = 0;
+    let SCREEN = SCREEN_MENU;
 
-        const snake = [];
-        let snakeDir = 1, nextDir = 1, snakeSpeed = 120, wall = 1, score = 0, food = { x: 0, y: 0 };
+    const snake = [];
+    let snakeDir = 1, nextDir = 1, snakeSpeed = 120, wall = 1, score = 0, food = { x: 0, y: 0 };
 
-        const screens = {
-            menu: document.getElementById("menu"),
-            gameover: document.getElementById("gameover"),
-            setting: document.getElementById("setting"),
-            snake: canvas,
-        };
+    let highScore = localStorage.getItem("highScore") ? parseInt(localStorage.getItem("highScore")) : 0;  // Load high score from localStorage
 
-        const buttons = {
-            newGame: [document.getElementById("new_game"), document.getElementById("new_game1"), document.getElementById("new_game2")],
-            setting: [document.getElementById("setting_menu"), document.getElementById("setting_menu1")]
-        };
+    const screens = {
+        menu: document.getElementById("menu"),
+        gameover: document.getElementById("gameover"),
+        setting: document.getElementById("setting"),
+        snake: canvas,
+    };
 
-        function renderScreen(screen) {
-            SCREEN = screen;
-            for (let key in screens) screens[key].style.display = "none";
-            switch (screen) {
-                case SCREEN_MENU: screens.menu.style.display = "block"; break;
-                case SCREEN_GAME_OVER: screens.gameover.style.display = "block"; break;
-                case SCREEN_SETTING: screens.setting.style.display = "block"; break;
-                case SCREEN_SNAKE: screens.snake.style.display = "block"; break;
-            }
+    const buttons = {
+        newGame: [document.getElementById("new_game"), document.getElementById("new_game1"), document.getElementById("new_game2")],
+        setting: [document.getElementById("setting_menu"), document.getElementById("setting_menu1")]
+    };
+
+    function renderScreen(screen) {
+        SCREEN = screen;
+        for (let key in screens) screens[key].style.display = "none";
+        switch (screen) {
+            case SCREEN_MENU: screens.menu.style.display = "block"; break;
+            case SCREEN_GAME_OVER: screens.gameover.style.display = "block"; break;
+            case SCREEN_SETTING: screens.setting.style.display = "block"; break;
+            case SCREEN_SNAKE: screens.snake.style.display = "block"; break;
+        }
+    }
+
+    function endGame() {
+        // Update high score if current score is higher
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("highScore", highScore); // Save new high score
         }
 
-        function newGame() {
-            renderScreen(SCREEN_SNAKE);
-            score = 0;
-            snake.length = 0;
-            snake.push({ x: 5, y: 5 }); // Start snake at a valid position
-            nextDir = 1;
+        renderScreen(SCREEN_GAME_OVER);
+        // Display high score on game over screen
+        document.getElementById("high_score_value").textContent = "High Score: " + highScore;
+    }
+
+    function newGame() {
+        renderScreen(SCREEN_SNAKE);
+        score = 0;
+        snake.length = 0;
+        snake.push({ x: 5, y: 5 }); // Start snake at a valid position
+        nextDir = 1;
+        placeFood();
+        loop();
+    }
+
+    function loop() {
+        const head = { ...snake[0] };
+        snakeDir = nextDir;
+
+        switch (snakeDir) {
+            case 0: head.y--; break;
+            case 1: head.x++; break;
+            case 2: head.y++; break;
+            case 3: head.x--; break;
+        }
+
+        // Check for collisions with walls (only if wall is enabled)
+        if (wall === 1 && (head.x < 0 || head.x >= canvas.width / BLOCK || head.y < 0 || head.y >= canvas.height / BLOCK)) {
+            endGame(); // Call the game over function when collision occurs
+            return;
+        }
+
+        // If wall is off, allow snake to wrap around
+        if (wall === 0) {
+            if (head.x < 0) head.x = canvas.width / BLOCK - 1;
+            if (head.x >= canvas.width / BLOCK) head.x = 0;
+            if (head.y < 0) head.y = canvas.height / BLOCK - 1;
+            if (head.y >= canvas.height / BLOCK) head.y = 0;
+        }
+
+        // Check for collisions with snake itself
+        if (snake.some(part => part.x === head.x && part.y === head.y)) {
+            endGame(); // End the game if the snake collides with itself
+            return;
+        }
+
+        snake.unshift(head);
+
+        // Check if snake eats food
+        if (head.x === food.x && head.y === food.y) {
+            score++;
             placeFood();
-            loop();
+        } else {
+            snake.pop();
         }
 
-        function loop() {
-            const head = { ...snake[0] };
-            snakeDir = nextDir;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            switch (snakeDir) {
-                case 0: head.y--; break;
-                case 1: head.x++; break;
-                case 2: head.y++; break;
-                case 3: head.x--; break;
-            }
+        ctx.fillStyle = "#f8d7f1";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Check for collisions with walls (only if wall is enabled)
-            if (wall === 1 && (head.x < 0 || head.x >= canvas.width / BLOCK || head.y < 0 || head.y >= canvas.height / BLOCK)) {
-                renderScreen(SCREEN_GAME_OVER);
-                return;
-            }
+        // Draw the snake and food ussing the updated block size
+        snake.forEach(part => ctx.drawImage(snakeImg, part.x * BLOCK, part.y * BLOCK, BLOCK, BLOCK));
+        ctx.drawImage(foodImg, food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
 
-            // If wall is off, allow snake to wrap around
-            if (wall === 0) {
-                if (head.x < 0) head.x = canvas.width / BLOCK - 1;
-                if (head.x >= canvas.width / BLOCK) head.x = 0;
-                if (head.y < 0) head.y = canvas.height / BLOCK - 1;
-                if (head.y >= canvas.height / BLOCK) head.y = 0;
-            }
+        // Update the score on the screen
+        document.getElementById("score_value").textContent = score;
+        document.getElementById("high_score_value").textContent = "High Score: " + highScore;
 
-            // Check for collisions with snake itself
-            if (snake.some(part => part.x === head.x && part.y === head.y)) {
-                renderScreen(SCREEN_GAME_OVER);
-                return;
-            }
+        // Call the loop recursively
+        setTimeout(loop, snakeSpeed);
+    }
 
-            snake.unshift(head);
+    function placeFood() {
+        food.x = Math.floor(Math.random() * canvas.width / BLOCK);
+        food.y = Math.floor(Math.random() * canvas.height / BLOCK);
+    }
 
-            // Check if snake eats food
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                placeFood();
-            } else {
-                snake.pop();
-            }
+    window.onload = function () {
+        // Set up the new game buttons
+        buttons.newGame.forEach(btn => btn.onclick = newGame);
+        // Set up the settings menu buttons
+        buttons.setting.forEach(btn => btn.onclick = () => renderScreen(SCREEN_SETTING));
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Initial screen render (show the menu)
+        renderScreen(SCREEN_MENU);
 
-            ctx.fillStyle = "#f8d7f1";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Handle key events for movement and starting the game
+        document.addEventListener("keydown", e => {
+            if (e.code === "Space" && SCREEN !== SCREEN_SNAKE) newGame();
+            if (e.keyCode >= 37 && e.keyCode <= 40) nextDir = [3, 0, 1, 2][e.keyCode - 37];
+        });
 
-            // Draw the snake and food using the updated block size
-            snake.forEach(part => ctx.drawImage(snakeImg, part.x * BLOCK, part.y * BLOCK, BLOCK, BLOCK));
-            ctx.drawImage(foodImg, food.x * BLOCK, food.y * BLOCK, BLOCK, BLOCK);
-
-            // Update the score on the screen
-            document.getElementById("score_value").textContent = score;
-
-            // Call the loop recursively
-            setTimeout(loop, snakeSpeed);
-        }
-
-        function placeFood() {
-            food.x = Math.floor(Math.random() * canvas.width / BLOCK);
-            food.y = Math.floor(Math.random() * canvas.height / BLOCK);
-        }
-
-        function setBlockSize(newSize) {
-            BLOCK = newSize;
-
-            // Resize the canvas dynamically to fit the new block size
-            const gridWidth = Math.floor(640 / BLOCK) * BLOCK;
-            canvas.width = gridWidth;
-            canvas.height = gridWidth;
-
-            newGame(); // Restart the game to apply changes
-        }
-
-        window.onload = function () {
-            // Set up the new game buttons
-            buttons.newGame.forEach(btn => btn.onclick = newGame);
-            // Set up the settings menu buttons
-            buttons.setting.forEach(btn => btn.onclick = () => renderScreen(SCREEN_SETTING));
-            // Add event listeners for block size changes
-            document.getElementById("size_tiny").onclick = () => setBlockSize(20);
-            document.getElementById("size_normal").onclick = () => setBlockSize(35);
-            document.getElementById("size_big").onclick = () => setBlockSize(45);
-            // Initial screen render (show the menu)
-            renderScreen(SCREEN_MENU);
-
-            // Handle key events for movement and starting the game
-            document.addEventListener("keydown", e => {
-                if (e.code === "Space" && SCREEN !== SCREEN_SNAKE) newGame();
-                if (e.keyCode >= 37 && e.keyCode <= 40) nextDir = [3, 0, 1, 2][e.keyCode - 37];
-            });
-
-            // Speed settings
-            document.getElementById("speed1").onclick = () => {
-                snakeSpeed = 175; // Slow
-            };
-            document.getElementById("speed2").onclick = () => {
-                snakeSpeed = 75; // Normal
-            };
-            document.getElementById("speed3").onclick = () => {
-                snakeSpeed = 35; // Fast
-            };
-
-            // Wall setting
-            document.getElementById("wallon").onclick = () => {
-                wall = 1; // Wall On
-            };
-            document.getElementById("walloff").onclick = () => {
-                wall = 0; // Wall Off
-            };
+        // Speed settings
+        document.getElementById("speed1").onclick = () => {
+            snakeSpeed = 175; // Slow
         };
-    })();
+        document.getElementById("speed2").onclick = () => {
+            snakeSpeed = 75; // Normal
+        };
+        document.getElementById("speed3").onclick = () => {
+            snakeSpeed = 35; // Fast
+        };
+
+        // Wall setting
+        document.getElementById("wallon").onclick = () => {
+            wall = 1; // Wall On
+        };
+        document.getElementById("walloff").onclick = () => {
+            wall = 0; // Wall Off
+        };
+    };
+})();
 </script>
