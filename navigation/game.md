@@ -249,7 +249,7 @@ permalink: /game/
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#f8d7f1";
+        ctx.fillStyle = "#ffddef";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw the snake and food ussing the updated block size
