@@ -3,6 +3,10 @@
 @import "variables";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
 
+/* New Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400&display=swap');
+
 @mixin large {
   @media screen and (min-width: #{$large-breakpoint}) {
     @content;
@@ -22,7 +26,7 @@
 }
 
 /* Variables for pink theme */
-$body-bg-color: #ffeef8; /* pastel pink */
+$body-bg-color: #ffddef; /* pastel pink */
 $header-bg-color: #ffb5da; /* soft pink */
 $header-heading-color: white;
 $body-link-color: #ff2290; /* bright pink */
@@ -33,6 +37,7 @@ $btn-active-bg-color: #ffb5da; /* lighter pink */
 $btn-active-text-color: white;
 $blockquote-text-color: #ff2290;
 $table-border-color: #ffa0cf;
+$body-text-color: #ff0080;
 
 * {
   box-sizing: border-box;
@@ -40,9 +45,9 @@ $table-border-color: #ffa0cf;
 
 /* Body styles */
 body {
-  padding: 0;
+  padding: 0 20px;
   margin: 0;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Lora', serif;
   font-size: 16px;
   line-height: 1.5;
   color: $body-text-color;
@@ -51,13 +56,15 @@ body {
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
-  color: #ffa0cf; /* soft pink */
+  font-family: 'Playfair Display', serif;
+  color: #ff79bc; /* soft pink */
+  margin-bottom: 1rem; /* add spacing below headings*/
 }
 
 /* Links */
 a {
   color: $body-link-color;
-  text-decoration: none;
+  text-decoration: underline;
 
   &:hover {
     text-decoration: underline;
@@ -96,6 +103,8 @@ a {
   background-color: $header-bg-color;
   color: $header-heading-color;
   text-align: center;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem; /* add spacing below header */
 }
 
 /* Skip to content link */

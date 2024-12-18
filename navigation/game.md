@@ -1,12 +1,13 @@
 ---
 layout: base
 title: Game
+description: Yasna's Blog
 permalink: /game/
 ---
 
 <style>
     body {
-        background-color: #f8d7f1;
+        background-color: #ffddef;
     }
 
     .wrap {

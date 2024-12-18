@@ -1,7 +1,7 @@
 ---
 layout: base
-title: Student Home
-description: Home Page
+title: Home Page
+description: Yasna's Blog
 hide: true
 ---
 
