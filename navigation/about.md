@@ -5,6 +5,23 @@ description: Yasna's Blog
 permalink: /about/
 ---
 
+<audio id="background-audio" preload="auto" muted>
+  <source src="{{ site.baseurl }}/audio/videoplayback (1).ogg" type="audio/ogg">
+  <source src="{{ site.baseurl }}/audio/videoplayback (1).mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const audio = document.getElementById("background-audio");
+
+  document.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.muted = false
+      ;
+      audio.play().catch(() => console.log("Autoplay failed"));
+    }
+  });
+</script>
+
 <div class="content">
   <ul>
     <li>Born in Isfahan, Iran in August, 2010.</li>

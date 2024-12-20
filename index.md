@@ -5,44 +5,21 @@ description: Yasna's Blog
 hide: true
 ---
 
-<audio id="background-audio" preload="auto">
+<audio id="background-audio" preload="auto" muted>
   <source src="audio/videoplayback (1).ogg" type="audio/ogg">
   <source src="audio/videoplayback (1).mp3" type="audio/mpeg">
 </audio>
 
-<!-- Custom Play/Pause Button -->
-<button id="play-button">Play Audio</button>
-
 <script>
-  const playButton = document.getElementById("play-button");
   const audio = document.getElementById("background-audio");
 
-  // Ensure audio is fully loaded before attempting to play
-  audio.addEventListener("canplaythrough", function() {
-    console.log("Audio is ready to play");
-  });
-
-  playButton.addEventListener("click", function() {
+  document.addEventListener("click", () => {
     if (audio.paused) {
-      // Play the audio and ensure it is loaded
-      audio.play().then(() => {
-        playButton.textContent = "Pause Audio";  // Change to "Pause Audio"
-      }).catch(error => console.error("Audio play failed: ", error));
-    } else {
-      audio.pause();
-      playButton.textContent = "Play Audio"; // Change to "Play Audio"
+      audio.muted = false;
+      audio.play().catch(() => console.log("Autoplay failed"));
     }
   });
-
-  // Ensure the audio starts from the beginning when played
-  audio.addEventListener("play", function() {
-    console.log("Audio started playing");
-    // Reset to start (in case of previous playback stopping prematurely)
-    audio.currentTime = 0;
-  });
 </script>
-
-
 
 Hi! I'm Yasna Ahmadi, a freshman at Del Norte High School. I love to bake, cook, draw, and play tennis. My favorite color is pink, lavender, and navy blue.
 
