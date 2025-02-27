@@ -43,14 +43,69 @@ const Prompt = {
         header.appendChild(th);
         table.appendChild(header);
     
-        return table;
+        // Use `currentNpc` to populate questions
+        if (this.currentNpc && this.currentNpc.questions) {
+            this.currentNpc.questions.forEach((question, index) => {
+                const row = document.createElement("tr");
+                // Question cell
+                const questionCell = document.createElement("td");
+                questionCell.innerText = `${index + 1}. ${question}`;
+                row.appendChild(questionCell);
+                // Input cell
+                const inputCell = document.createElement("td");
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Your answer here...";
+                input.dataset.questionIndex = index; // Tag input with the question index
+                inputCell.appendChild(input);
+                row.appendChild(inputCell);
+                table.appendChild(row);
+            });
+            // Add submit button
+            const submitRow = document.createElement("tr");
+            const submitCell = document.createElement("td");
+            submitCell.colSpan = 2;
+            submitCell.style.textAlign = "center";
+            const submitButton = document.createElement("button");
+            submitButton.innerText = "Submit";
+            submitButton.addEventListener("click", this.handleSubmit.bind(this)); // Attach submission handler
+            submitCell.appendChild(submitButton);
+            submitRow.appendChild(submitCell);
+            table.appendChild(submitRow);
+        } else {
+            const row = document.createElement("tr");
+            const noQuestionsCell = document.createElement("td");
+            noQuestionsCell.colSpan = 2;
+            noQuestionsCell.innerText = "No questions available.";
+            row.appendChild(noQuestionsCell);
+            table.appendChild(row);
+        }
+        // Wrap the table in a scrollable container
+        const container = document.createElement("div");
+        container.style.maxHeight = "400px"; // Limit height for scrollability
+        container.style.overflowY = "auto"; // Enable vertical scrolling
+        container.style.border = "1px solid #ccc"; // Optional: add a border
+        container.style.padding = "10px"; // Optional: add some padding
+        container.appendChild(table);
+        return container;
     },
-    
-    
+
+    handleSubmit() {
+        // Collect all answers
+        const inputs = document.querySelectorAll("input[type='text']");
+        const answers = Array.from(inputs).map(input => ({
+            questionIndex: input.dataset.questionIndex,
+            answer: input.value.trim()
+        }));
+        console.log("Submitted Answers:", answers);
+        // Handle the submission logic (e.g., save answers, validate, etc.)
+        alert("Your answers have been submitted!");
+        Prompt.isOpen = false;
+        Prompt.backgroundDim.remove();
+    },
 
     toggleDetails() {
         Prompt.detailed = !Prompt.detailed
-
         Prompt.updatePromptDisplay()
     },
 
@@ -102,21 +157,7 @@ const Prompt = {
         container.appendChild(table);
         return container;
     },
-    handleSubmit() {
-        // Collect all answers
-        const inputs = document.querySelectorAll("input[type='text']");
-        const answers = Array.from(inputs).map(input => ({
-            questionIndex: input.dataset.questionIndex,
-            answer: input.value.trim()
-        }));
-        console.log("Submitted Answers:", answers);
-        // Handle the submission logic (e.g., save answers, validate, etc.)
-        alert("Your answers have been submitted!");
-        Prompt.isOpen = false;
-        Prompt.backgroundDim.remove();
-    },
-    
-    
+
     updatePromptDisplay () {
         const table = document.getElementsByClassName("table scores")[0]
         const detailToggleSection = document.getElementById("detail-toggle-section")
@@ -139,10 +180,7 @@ const Prompt = {
             clearButtonRow.remove()
         }
 
-        
         document.getElementById("promptDropDown").append(Prompt.updatePromptTable()) //update new Prompt
-        
-        
     },
 
     backPage () {
@@ -151,17 +189,14 @@ const Prompt = {
         if (Prompt.currentPage - 1 == 0) {
             return;
         }
-    
 
         Prompt.currentPage -= 1
-
         Prompt.updatePromptDisplay()
     },
     
     frontPage () {
         Prompt.currentPage += 1
         Prompt.updatePromptDisplay()
-        
     },
 
     openPromptPanel(npc) {
@@ -198,7 +233,6 @@ const Prompt = {
         promptDropDown.style.left = "15%"; 
         promptDropDown.style.transition = "all 0.3s ease-in-out"; 
     },
-    
 
     initializePrompt () {
         const promptTitle = document.createElement("div");

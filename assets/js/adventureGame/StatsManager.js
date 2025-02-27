@@ -56,3 +56,66 @@ export function getQuestionsAnswered() {
         })
         .catch(err => console.error("Error fetching questions answered:", err));
 }
+
+/**
+ * Updates the player's balance.
+ * 
+ * @param {number} amount - The amount to update the balance by.
+ */
+export function updateBalance(amount) {
+    fetch(`${javaURI}/rpg_answer/updateBalance/1`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ amount })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("balance").innerText = data ?? 0;
+    })
+    .catch(err => console.error("Error updating balance:", err));
+}
+
+/**
+ * Updates the player's chat score.
+ * 
+ * @param {number} score - The score to update the chat score by.
+ */
+export function updateChatScore(score) {
+    fetch(`${javaURI}/rpg_answer/updateChatScore/1`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ score })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("chatScore").innerText = data ?? 0;
+    })
+    .catch(err => console.error("Error updating chat score:", err));
+}
+
+/**
+ * Updates the number of questions answered by the player.
+ * 
+ * @param {number} count - The number of questions answered to update.
+ */
+export function updateQuestionsAnswered(count) {
+    fetch(`${javaURI}/rpg_answer/updateQuestionsAnswered/1`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ count })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("questionsAnswered").innerText = data ?? 0;
+    })
+    .catch(err => console.error("Error updating questions answered:", err));
+}
+
+/**
+ * Updates all stats (balance, chat score, questions answered).
+ */
+export function updateStats() {
+    getBalance();
+    getChatScore();
+    getQuestionsAnswered();
+}

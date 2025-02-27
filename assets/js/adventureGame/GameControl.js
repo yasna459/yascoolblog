@@ -1,9 +1,8 @@
 import GameEnv from './GameEnv.js';
-import GameLevelWater from './GameLevelWater.js';
-import GameLevelDesert from './GameLevelDesert.js';
-import { getStats } from "./StatsManager.js";
-
-
+import GameLevelAncientEgypt from './GameLevelAncientEgypt.js';
+import GameLevelVictorianEra from './GameLevelVictorianEra.js';
+import { getStats, updateStats } from "./StatsManager.js";
+import Prompt from './Prompt.js';
 
 const createStatsUI = () => {
     const statsContainer = document.createElement('div');
@@ -19,8 +18,49 @@ const createStatsUI = () => {
         <div>Balance: <span id="balance">0</span></div>
         <div>Chat Score: <span id="chatScore">0</span></div>
         <div>Questions Answered: <span id="questionsAnswered">0</span></div>
+        <div>High Score: <span id="highScore">0</span></div>
+        <div>Time Elapsed: <span id="timeElapsed">0</span></div>
     `;
     document.body.appendChild(statsContainer);
+};
+
+const updateStatsUI = () => {
+    const stats = getStats();
+    document.getElementById('balance').innerText = stats.balance;
+    document.getElementById('chatScore').innerText = stats.chatScore;
+    document.getElementById('questionsAnswered').innerText = stats.questionsAnswered;
+    document.getElementById('highScore').innerText = stats.highScore;
+    document.getElementById('timeElapsed').innerText = stats.timeElapsed;
+};
+
+const createHintButton = () => {
+    const hintButton = document.createElement('button');
+    hintButton.id = 'hint-button';
+    hintButton.innerText = 'Hint';
+    hintButton.style.position = 'fixed';
+    hintButton.style.bottom = '10px';
+    hintButton.style.right = '10px';
+    hintButton.style.padding = '10px';
+    hintButton.style.borderRadius = '5px';
+    hintButton.addEventListener('click', () => {
+        Prompt.showHint();
+    });
+    document.body.appendChild(hintButton);
+};
+
+const createTranscriptButton = () => {
+    const transcriptButton = document.createElement('button');
+    transcriptButton.id = 'transcript-button';
+    transcriptButton.innerText = 'Transcript';
+    transcriptButton.style.position = 'fixed';
+    transcriptButton.style.bottom = '10px';
+    transcriptButton.style.right = '80px';
+    transcriptButton.style.padding = '10px';
+    transcriptButton.style.borderRadius = '5px';
+    transcriptButton.addEventListener('click', () => {
+        Prompt.showTranscript();
+    });
+    document.body.appendChild(transcriptButton);
 };
 
 /**
@@ -34,30 +74,38 @@ const createStatsUI = () => {
  * making it easier to manage game states, handle events, and maintain the overall flow of the game.
  * 
  * @type {Object}
- * @property {Player} turtle - The player object.
- * @property {Player} fish 
+ * @property {Player} player - The player object.
  * @property {function} start - Initialize game assets and start the game loop.
  * @property {function} gameLoop - The game loop.
  * @property {function} resize - Resize the canvas and player object when the window is resized.
  */
 const GameControl = {
     intervalID: null, // Variable to hold the timer interval reference
+    startTime: null, // Variable to hold the start time of the game
     localStorageTimeKey: "localTimes",
     currentPass: 0,
     currentLevelIndex: 0,
     levelClasses: [],
     path: '',
+    questionsAnsweredCorrectly: 0,
+    maxQuestions: 10,
+    requiredCorrectAnswers: 9,
 
-    start: function(path) {
+    start(path) {
         GameEnv.create();
-        this.levelClasses = [GameLevelDesert, GameLevelWater];
+        this.levelClasses = [GameLevelAncientEgypt, GameLevelVictorianEra];
         this.currentLevelIndex = 0;
         this.path = path;
         this.addExitKeyListener();
         this.loadLevel();
+        createStatsUI();
+        createHintButton();
+        createTranscriptButton();
+        this.startTime = Date.now();
+        this.intervalID = setInterval(this.updateTimeElapsed.bind(this), 1000); // Update time elapsed every second
     },
     
-    loadLevel: function() {
+    loadLevel() {
         if (this.currentLevelIndex >= this.levelClasses.length) {
             this.stopTimer();
             return;
@@ -65,12 +113,13 @@ const GameControl = {
         GameEnv.continueLevel = true;
         GameEnv.gameObjects = [];
         this.currentPass = 0;
+        this.questionsAnsweredCorrectly = 0;
         const LevelClass = this.levelClasses[this.currentLevelIndex];
         const levelInstance = new LevelClass(this.path);
         this.loadLevelObjects(levelInstance);
     },
     
-    loadLevelObjects: function(gameInstance) {
+    loadLevelObjects(gameInstance) {
         this.initStatsUI();
         // Instantiate the game objects
         for (let object of gameInstance.objects) {
@@ -82,7 +131,7 @@ const GameControl = {
         getStats();
     },
 
-    gameLoop: function() {
+    gameLoop() {
         // Base case: leave the game loop 
         if (!GameEnv.continueLevel) {
             this.handleLevelEnd();
@@ -98,7 +147,7 @@ const GameControl = {
         requestAnimationFrame(this.gameLoop.bind(this));
     },
 
-    handleLevelStart: function() {
+    handleLevelStart() {
         // First time message for level 0, delay 10 passes
         if (this.currentLevelIndex === 0 && this.currentPass === 10) {
             alert("Start Level.");
@@ -107,7 +156,7 @@ const GameControl = {
         this.currentPass++;
     },
 
-    handleLevelEnd: function() {
+    handleLevelEnd() {
         // More levels to play 
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             alert("Level ended.");
@@ -124,7 +173,7 @@ const GameControl = {
         this.loadLevel();
     },
     
-    resize: function() {
+    resize() {
         // Resize the game environment
         GameEnv.resize();
         // Resize the game objects
@@ -133,7 +182,7 @@ const GameControl = {
         }
     },
 
-    addExitKeyListener: function() {
+    addExitKeyListener() {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 GameEnv.continueLevel = false;
@@ -225,25 +274,6 @@ const GameControl = {
         clearInterval(this.intervalID)
     },
 
-    saveTime() {
-        const data = {
-            userID: GameEnv.userID,
-            time: GameEnv.time - 10,
-            coinScore: GameEnv.coinScore
-        }
-
-        const currDataList = JSON.parse(localStorage.getItem(this.localStorageTimeKey))
-
-        if (!currDataList || !Array.isArray(currDataList)) {
-            localStorage.setItem(this.localStorageTimeKey, JSON.stringify([data]))
-            return;
-        }
-
-        currDataList.push(data)
-        
-        localStorage.setItem(this.localStorageTimeKey, JSON.stringify(currDataList))
-    },  
-
     // Initialize UI for game stats
     initStatsUI: function() {
         const statsContainer = document.createElement('div');
@@ -263,6 +293,57 @@ const GameControl = {
         document.body.appendChild(statsContainer);
     },
 
+    updateTimeElapsed() {
+        const currentTime = Date.now();
+        const timeElapsed = Math.floor((currentTime - this.startTime) / 1000); // Time in seconds
+        updateStats({ timeElapsed });
+        updateStatsUI();
+    },
+
+    /**
+     * Handles the quiz logic for the guards.
+     * @param {Object} guard - The guard object.
+     */
+    handleGuardQuiz(guard) {
+        const questions = guard.data.quiz.questions;
+        let correctAnswers = 0;
+
+        questions.forEach(question => {
+            const answer = prompt(question);
+            if (this.checkAnswer(question, answer)) {
+                correctAnswers++;
+            }
+        });
+
+        this.questionsAnsweredCorrectly += correctAnswers;
+
+        if (this.questionsAnsweredCorrectly >= this.requiredCorrectAnswers) {
+            this.startChase();
+        } else {
+            alert("You need to answer at least 9 out of 10 questions correctly. Try again.");
+            this.handleGuardQuiz(guard);
+        }
+    },
+
+    /**
+     * Checks if the provided answer is correct.
+     * @param {string} question - The question string.
+     * @param {string} answer - The provided answer.
+     * @returns {boolean} - True if the answer is correct, false otherwise.
+     */
+    checkAnswer(question, answer) {
+        // Implement your answer checking logic here
+        // For simplicity, let's assume the correct answer is always "1"
+        return answer === "1";
+    },
+
+    /**
+     * Starts the chase sequence.
+     */
+    startChase() {
+        alert("The chase begins!");
+        // Implement your chase logic here
+    }
 };
 
 // Detect window resize events and call the resize function.

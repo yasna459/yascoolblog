@@ -6,8 +6,8 @@ import GameObject from './GameObject.js';
  */
 export class Background extends GameObject {
     constructor(data = null) {
-        super();
-        if (data.src) {
+        super(data);
+        if (data && data.src) {
             this.image = new Image();
             this.image.src = data.src;
         } else {
@@ -21,8 +21,8 @@ export class Background extends GameObject {
      */
     draw() {
         const ctx = GameEnv.ctx;
-        const width = GameEnv.innerWidth;
-        const height = GameEnv.innerHeight;
+        const width = GameEnv.canvas.width;
+        const height = GameEnv.canvas.height;
 
         if (this.image) {
             // Draw the background image scaled to the canvas size
@@ -57,7 +57,6 @@ export class Background extends GameObject {
             GameEnv.gameObjects.splice(index, 1);
         }
     }
-    
 }
 
 export default Background;

@@ -1,7 +1,19 @@
-import GameEnv from "./GameEnv.js";
-import Character from "./Character.js";
+import Character from './Character.js';
 import Prompt from "./Prompt.js";
+
+/**
+ * The Npc class represents a non-player character in the game.
+ * It extends the Character class and handles quiz interactions with the player.
+ * 
+ * @class Npc
+ * @extends Character
+ */
 class Npc extends Character {
+    /**
+     * Constructor for the Npc class.
+     * 
+     * @param {Object} data - The data for the NPC, including quiz questions.
+     */
     constructor(data = null) {
         super(data);
         this.quiz = data?.quiz?.title; // Quiz title
@@ -10,6 +22,7 @@ class Npc extends Character {
         this.alertTimeout = null;
         this.bindEventListeners();
     }
+
     /**
      * Override the update method to draw the NPC.
      * This NPC is stationary, so the update method only calls the draw method.
@@ -17,6 +30,7 @@ class Npc extends Character {
     update() {
         this.draw();
     }
+
     /**
      * Bind key event listeners for proximity interaction.
      */
@@ -24,6 +38,7 @@ class Npc extends Character {
         addEventListener('keydown', this.handleKeyDown.bind(this));
         addEventListener('keyup', this.handleKeyUp.bind(this));
     }
+
     /**
      * Handle keydown events for interaction.
      * @param {Object} event - The keydown event.
@@ -36,44 +51,57 @@ class Npc extends Character {
                 break;
         }
     }
+
     /**
      * Handle keyup events to stop player actions.
      * @param {Object} event - The keyup event.
      */
     handleKeyUp({ key }) {
         if (key === 'e' || key === 'u') {
-            // Clear any active timeouts when the interaction key is released
-            if (this.alertTimeout) {
-                clearTimeout(this.alertTimeout);
-                this.alertTimeout = null;
-            }
+            clearTimeout(this.alertTimeout);
         }
     }
+
     /**
-     * Get the next question in the shuffled array.
-     * @returns {string} - The next quiz question.
-     */
-    getNextQuestion() {
-        const question = this.questions[this.currentQuestionIndex];
-        this.currentQuestionIndex = (this.currentQuestionIndex + 1) % this.questions.length; // Cycle through questions
-        return question;
-    }
-    /**
-     * Handle proximity interaction and share a quiz question.
+     * Shares a quiz question with the player.
      */
     shareQuizQuestion() {
-        const players = GameEnv.gameObjects.filter(obj => obj.state.collisionEvents.includes(this.spriteData.id));
-        const hasQuestions = this.questions.length > 0;
-        if (players.length > 0 && hasQuestions) {
-            players.forEach(player => {
-                if (!Prompt.isOpen) {
-                    // Assign this NPC as the current NPC in the Prompt system
-                    Prompt.currentNpc = this;
-                    // Open the Prompt panel with this NPC's details
-                    Prompt.openPromptPanel(this);
-                }
-            });
+        if (this.currentQuestionIndex < this.questions.length) {
+            const question = this.questions[this.currentQuestionIndex];
+            alert(question);
+            this.currentQuestionIndex++;
+        } else {
+            alert("You have answered all the questions!");
         }
     }
+
+    /**
+     * Resizes the NPC based on the canvas size.
+     */
+    resize() {
+        // NPCs are static, so no resize logic is needed
+    }
+
+    /**
+     * Removes the NPC from the game environment.
+     */
+    destroy() {
+        GameEnv.removeGameObject(this);
+    }
+
+    /**
+     * Checks for collisions with other game objects.
+     */
+    collisionChecks() {
+        // Implement collision detection logic if needed
+    }
+
+    /**
+     * Detects collisions with other game objects.
+     */
+    isCollision() {
+        // Implement collision detection logic if needed
+    }
 }
+
 export default Npc;
