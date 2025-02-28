@@ -2,19 +2,16 @@ import Character from './Character.js';
 import GameEnv from './GameEnv.js';
 import Player from './Player.js';
 
-/**
- * Enemy class extends Character and serves as a base class for all enemy objects.
- * 
- * This class provides common properties and methods for enemies.
- * 
- */
 class Enemy extends Character {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
-        this.playerFound = false; // Initialize target property
-        this.playerDestroyed = false;
+        this.playerFound = false;
+        this.playerDestroyed = false;     
     }
 
+    /**
+     * Override the update method to draw the Enemy.
+     */
     update() {
         // Update begins by drawing the object
         this.draw();
@@ -36,7 +33,7 @@ class Enemy extends Character {
     }
 
     /**
-     * Chases the target.
+     * stayWithinCanvas method ensures that the object stays within the boundaries of the canvas.
      */
     stayWithinCanvas() {
         // Bottom of the canvas

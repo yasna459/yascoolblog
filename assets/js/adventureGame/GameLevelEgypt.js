@@ -5,6 +5,7 @@ import Npc from './Npc.js';
 import Quiz from './Quiz.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
+import Cat from './Cat.js';
 
 class GameLevelEgypt {
   constructor(gameEnv) {
@@ -13,6 +14,7 @@ class GameLevelEgypt {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
+    // Function to log
     // Background data
     const image_src_egypt = path + "/images/gamify/ancientegyptbackground.png"; // be sure to include the path
     const image_data_egypt = {
@@ -32,7 +34,7 @@ class GameLevelEgypt {
         src: sprite_src_tourist,
         SCALE_FACTOR: TOURIST_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 50,
+        ANIMATION_RATE: 100,
         INIT_POSITION: { x: 0, y: height - (height/TOURIST_SCALE_FACTOR) }, 
         pixels: {height: 320, width: 120},
         orientation: {rows: 4, columns: 3 },
@@ -49,6 +51,7 @@ class GameLevelEgypt {
     };
 
     const sprite_src_guide = path + "/images/gamify/ratguide.png"; // be sure to include the path
+    console.log(`Loading NPC sprite from: ${sprite_src_guide}`);
     const sprite_greet_guide = "Hi, I'm the Rat and I'll be your guide. Ancient Egypt was one of the most advanced and influential civilizations in history, thriving along the Nile River, which provided fertile land and a stable food supply. The first pharaoh of Egypt was Narmer, who unified Upper and Lower Egypt around 3100 BCE. The Egyptians developed hieroglyphics, a complex writing system using pictorial symbols to record their history, religious beliefs, and government activities. The Great Pyramid of Giza, built as a tomb for Pharaoh Khufu, stands as a remarkable achievement of Egyptian engineering, primarily constructed from stone. The pyramids were built as tombs for pharaohs, ensuring their safe passage into the afterlife. The Sphinx, a majestic statue with a lion’s body and a human head, served as the guardian of the Giza Plateau. Egyptian religion played a significant role in daily life, with Osiris being the god of the afterlife and Cleopatra known for her beauty and political skill in leading Egypt. Another famous queen, Nefertiti, was admired for her powerful influence during the reign of Pharaoh Akhenaten. Pharaoh Tutankhamun, often called King Tut, is famous today because his tomb was discovered nearly intact in 1922, providing valuable insights into Egyptian burial practices. Ancient Egypt’s rich culture, monumental architecture, and powerful rulers continue to captivate the world today.";
     const sprite_data_guide = {
       id: 'Rat Guide',
@@ -56,7 +59,7 @@ class GameLevelEgypt {
       src: sprite_src_guide,
       SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
       ANIMATION_RATE: 100,
-      pixels: {width: 63, height: 120},
+      pixels: {width: 171.6, height: 222.2},
       INIT_POSITION: { x: (width * 1 / 4), y: (height * 3 / 4) }, // Adjusted position
       orientation: {rows: 1, columns: 1 },
       down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
@@ -132,41 +135,62 @@ class GameLevelEgypt {
       reaction: function() {
         alert(sprite_greet_tombguard);
       },
-      /* Interact function
-      *  This function is called when the player interacts with the NPC
-      *  It pauses the main game, creates a new GameControl instance with the StarWars level,
-      */
+    };
+
+    const sprite_src_cat = path + "/images/gamify/catenemy.png"; // be sure to include the path
+    console.log(`Loading NPC sprite from: ${sprite_src_cat}`);
+    const sprite_greet_cat = "It's over!";
+    const sprite_data_cat = {
+      id: 'Cat Enemy',
+      greeting: sprite_greet_cat,
+      src: sprite_src_cat,
+      SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
+      ANIMATION_RATE: 100,
+      pixels: {width: 63, height: 120},
+      INIT_POSITION: { x: ((width * 1 / 4) + 100), y: ((height * 3 / 4) - 20)}, // Adjusted position
+      orientation: {rows: 1, columns: 1 },
+      down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
+      hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        /* Reaction function
+        *  This function is called when the player interacts with the NPC
+        *  It displays an alert with the greeting message
+        */
+      reaction: function() {
+        alert(sprite_greet_cat);
+      },
+
       interact: function() {
-        // Set a primary game reference from the game environment
+              // Set a primary game reference from the game environment
         let primaryGame = gameEnv.gameControl;
-        // Define the game in game level
+              // Define the game in game level
         let levelArray = [GameLevelStarWars];
-        // Define a new GameControl instance with the StarWars level
+              // Define a new GameControl instance with the StarWars level
         let gameInGame = new GameControl(path,levelArray);
-        // Pause the primary game 
+              // Pause the primary game 
         primaryGame.pause();
-        // Start the game in game
+              // Start the game in game
         gameInGame.start();
-        // Setup "callback" function to allow transition from game in gaame to the underlying game
+              // Setup "callback" function to allow transition from game in gaame to the underlying game
         gameInGame.gameOver = function() {
-          // Call .resume on primary game
+                // Call .resume on primary game
           primaryGame.resume();
         }
       }
-
     };
-
-    // List of objects defnitions for this level
-    this.classes = [
-      { class: Background, data: image_data_egypt },
-      { class: Player, data: sprite_data_tourist },
-      { class: Npc, data: sprite_data_pyramidguard },
-      { class: Npc, data: sprite_data_tombguard },
-      { class: Npc, data: sprite_data_guide },
-    ];
     
-  }
-
-}
-
-export default GameLevelEgypt;
+        // List of objects defnitions for this level
+        this.classes = [
+          { class: Background, data: image_data_egypt },
+          { class: Player, data: sprite_data_tourist },
+          { class: Npc, data: sprite_data_pyramidguard },
+          { class: Npc, data: sprite_data_tombguard },
+          { class: Npc, data: sprite_data_guide },
+          { class: Cat, data: sprite_data_cat}
+        ];
+    
+        
+      }
+    
+    }
+    
+    export default GameLevelEgypt;
