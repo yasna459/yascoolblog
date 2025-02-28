@@ -15,6 +15,12 @@ class GameLevelEgypt {
     let path = gameEnv.path;
 
     // Function to log
+    function logImageLoadingStatus(imageSrc, id) {
+      const img = new Image();
+      img.src = imageSrc;
+      img.onload = () => console.log(`Loaded image for ${id}: ${imageSrc}`);
+      img.onerror = () => console.error(`Failed to load image for ${id}: ${imageSrc}`);
+    }
     // Background data
     const image_src_egypt = path + "/images/gamify/ancientegyptbackground.png"; // be sure to include the path
     const image_data_egypt = {
@@ -50,9 +56,11 @@ class GameLevelEgypt {
         keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
     };
 
+    
+    // Rat Guide data
     const sprite_src_guide = path + "/images/gamify/ratguide.png"; // be sure to include the path
-    console.log(`Loading NPC sprite from: ${sprite_src_guide}`);
-    const sprite_greet_guide = "Hi, I'm the Rat and I'll be your guide. Ancient Egypt was one of the most advanced and influential civilizations in history, thriving along the Nile River, which provided fertile land and a stable food supply. The first pharaoh of Egypt was Narmer, who unified Upper and Lower Egypt around 3100 BCE. The Egyptians developed hieroglyphics, a complex writing system using pictorial symbols to record their history, religious beliefs, and government activities. The Great Pyramid of Giza, built as a tomb for Pharaoh Khufu, stands as a remarkable achievement of Egyptian engineering, primarily constructed from stone. The pyramids were built as tombs for pharaohs, ensuring their safe passage into the afterlife. The Sphinx, a majestic statue with a lion’s body and a human head, served as the guardian of the Giza Plateau. Egyptian religion played a significant role in daily life, with Osiris being the god of the afterlife and Cleopatra known for her beauty and political skill in leading Egypt. Another famous queen, Nefertiti, was admired for her powerful influence during the reign of Pharaoh Akhenaten. Pharaoh Tutankhamun, often called King Tut, is famous today because his tomb was discovered nearly intact in 1922, providing valuable insights into Egyptian burial practices. Ancient Egypt’s rich culture, monumental architecture, and powerful rulers continue to captivate the world today.";
+    logImageLoadingStatus(sprite_src_guide, 'Rat Guide');
+    const sprite_greet_guide = "Hi, I'm the Rat and I'll be your guide. Ancient Egypt was one of the most advanced and influential civilizations in history...";
     const sprite_data_guide = {
       id: 'Rat Guide',
       greeting: sprite_greet_guide,
@@ -64,14 +72,14 @@ class GameLevelEgypt {
       orientation: {rows: 1, columns: 1 },
       down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      /* Reaction function
-      *  This function is called when the player interacts with the NPC
-      *  It displays an alert with the greeting message
-      */
       reaction: function() {
         alert(sprite_greet_guide);
       },
     };
+
+    // Log the guide's data and position
+    console.log("Rat Guide Data:", sprite_data_guide);
+    console.log("Rat Guide Position:", sprite_data_guide.INIT_POSITION.x, sprite_data_guide.INIT_POSITION.y);
 
     // NPC data for Pyramid Guard 
     const sprite_src_pyramidguard = path + "/images/gamify/pyramid_guard.png"; // be sure to include the path
