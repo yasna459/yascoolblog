@@ -5,7 +5,6 @@ import Npc from './Npc.js';
 import Quiz from './Quiz.js';
 import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
-import Cat from './Cat.js';
 
 class GameLevelEgypt {
   constructor(gameEnv) {
@@ -14,13 +13,6 @@ class GameLevelEgypt {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
-    // Function to log
-    function logImageLoadingStatus(imageSrc, id) {
-      const img = new Image();
-      img.src = imageSrc;
-      img.onload = () => console.log(`Loaded image for ${id}: ${imageSrc}`);
-      img.onerror = () => console.error(`Failed to load image for ${id}: ${imageSrc}`);
-    }
     // Background data
     const image_src_egypt = path + "/images/gamify/ancientegyptbackground.png"; // be sure to include the path
     const image_data_egypt = {
@@ -59,24 +51,48 @@ class GameLevelEgypt {
     
     // Rat Guide data
     const sprite_src_guide = path + "/images/gamify/ratguide.png"; // be sure to include the path
-    logImageLoadingStatus(sprite_src_guide, 'Rat Guide');
-    const sprite_greet_guide = "Hi, I'm the Rat and I'll be your guide. Ancient Egypt was one of the most advanced and influential civilizations in history...";
+    const sprite_greet_guide_intro = "Hi, you don't look like you're from around here. I'm the Rat Guide, and I'll help you navigate Ancient Egypt. Press OK to learn more about this era!";
+    const sprite_greet_guide_info = "Ancient Egypt was one of the most advanced and influential civilizations in history, thriving along the Nile River, which provided fertile land and a stable food supply. The first pharaoh of Egypt was Narmer, who unified Upper and Lower Egypt around 3100 BCE. The Egyptians developed hieroglyphics, a complex writing system using pictorial symbols to record their history, religious beliefs, and government activities. The Great Pyramid of Giza, built as a tomb for Pharaoh Khufu, stands as a remarkable achievement of Egyptian engineering, primarily constructed from stone. The pyramids were built as tombs for pharaohs, ensuring their safe passage into the afterlife. The Sphinx, a majestic statue with a lion’s body and a human head, served as the guardian of the Giza Plateau. Egyptian religion played a significant role in daily life, with Osiris being the god of the afterlife and Cleopatra known for her beauty and political skill in leading Egypt. Another famous queen, Nefertiti, was admired for her powerful influence during the reign of Pharaoh Akhenaten. Pharaoh Tutankhamun, often called King Tut, is famous today because his tomb was discovered nearly intact in 1922, providing valuable insights into Egyptian burial practices. Ancient Egypt’s rich culture, monumental architecture, and powerful rulers continue to captivate the world today.";
     const sprite_data_guide = {
       id: 'Rat Guide',
-      greeting: sprite_greet_guide,
+      greeting_intro: sprite_greet_guide_intro,
+      greeting_info: sprite_greet_guide_info,
       src: sprite_src_guide,
       SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
       ANIMATION_RATE: 100,
-      pixels: {width: 171.6, height: 222.2},
-      INIT_POSITION: { x: (width * 1 / 4), y: (height * 3 / 4) }, // Adjusted position
+      pixels: {width: 150, height: 194},
+      INIT_POSITION: { x: 100, y: height - (height / TOURIST_SCALE_FACTOR) }, // Adjusted position
       orientation: {rows: 1, columns: 1 },
       down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      reaction: function() {
-        alert(sprite_greet_guide);
-      },
     };
 
+    // Custom alert function to handle sequential notifications
+    function customAlert(message, callback) {
+      alert(message);
+      if (callback) callback();
+    }
+
+    // Display the initial notification automatically
+    setTimeout(() => {
+      customAlert(image_data_egypt.greeting);
+    }, 1000); // Display the first notification 1 second after the game starts
+
+    // Function to handle player interaction and display Rat Guide notifications
+    function handlePlayerInteraction(event) {
+      const keys = [87, 65, 83, 68]; // W, A, S, D key codes
+      if (keys.includes(event.keyCode)) {
+        setTimeout(() => {
+          customAlert(sprite_data_guide.greeting_intro, () => {
+            customAlert(sprite_data_guide.greeting_info);
+          });
+        }, 500); // Display the Rat Guide notifications 0.5 seconds after interaction
+        window.removeEventListener('keydown', handlePlayerInteraction); // Remove the event listener after the first interaction
+      }
+    }
+
+    // Add event listener for player interaction
+    window.addEventListener('keydown', handlePlayerInteraction);
     // Log the guide's data and position
     console.log("Rat Guide Data:", sprite_data_guide);
     console.log("Rat Guide Position:", sprite_data_guide.INIT_POSITION.x, sprite_data_guide.INIT_POSITION.y);
@@ -144,47 +160,6 @@ class GameLevelEgypt {
         alert(sprite_greet_tombguard);
       },
     };
-
-    const sprite_src_cat = path + "/images/gamify/catenemy.png"; // be sure to include the path
-    console.log(`Loading NPC sprite from: ${sprite_src_cat}`);
-    const sprite_greet_cat = "It's over!";
-    const sprite_data_cat = {
-      id: 'Cat Enemy',
-      greeting: sprite_greet_cat,
-      src: sprite_src_cat,
-      SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
-      ANIMATION_RATE: 100,
-      pixels: {width: 63, height: 120},
-      INIT_POSITION: { x: ((width * 1 / 4) + 100), y: ((height * 3 / 4) - 20)}, // Adjusted position
-      orientation: {rows: 1, columns: 1 },
-      down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
-      hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-        /* Reaction function
-        *  This function is called when the player interacts with the NPC
-        *  It displays an alert with the greeting message
-        */
-      reaction: function() {
-        alert(sprite_greet_cat);
-      },
-
-      interact: function() {
-              // Set a primary game reference from the game environment
-        let primaryGame = gameEnv.gameControl;
-              // Define the game in game level
-        let levelArray = [GameLevelStarWars];
-              // Define a new GameControl instance with the StarWars level
-        let gameInGame = new GameControl(path,levelArray);
-              // Pause the primary game 
-        primaryGame.pause();
-              // Start the game in game
-        gameInGame.start();
-              // Setup "callback" function to allow transition from game in gaame to the underlying game
-        gameInGame.gameOver = function() {
-                // Call .resume on primary game
-          primaryGame.resume();
-        }
-      }
-    };
     
         // List of objects defnitions for this level
         this.classes = [
@@ -193,7 +168,6 @@ class GameLevelEgypt {
           { class: Npc, data: sprite_data_pyramidguard },
           { class: Npc, data: sprite_data_tombguard },
           { class: Npc, data: sprite_data_guide },
-          { class: Cat, data: sprite_data_cat}
         ];
     
         
