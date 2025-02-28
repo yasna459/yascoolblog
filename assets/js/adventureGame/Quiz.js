@@ -1,11 +1,16 @@
-const Prompt = {
-    isOpen: false,
-    dim: false,
+import gameControlInstance from "./GameControl.js";
+class Quiz {
+    constructor() {
+        this.isOpen = false;
+        this.dim = false;
+        this.currentNpc = null;
+        this.currentPage = 0;
+    }
 
-    backgroundDim: {
-        create () {
-            this.dim = true // sets the dim to be true when the prompt is opened
-            console.log("CREATE DIM")
+    backgroundDim = {
+        create: () => {
+            this.dim = true;
+            console.log("CREATE DIM");
             const dimDiv = document.createElement("div");
             dimDiv.id = "dim";
             dimDiv.style.backgroundColor = "black";
@@ -14,22 +19,29 @@ const Prompt = {
             dimDiv.style.position = "absolute";
             dimDiv.style.opacity = "0.8";
             document.body.append(dimDiv);
-            dimDiv.style.zIndex = "9998"
-            dimDiv.addEventListener("click", Prompt.backgroundDim.remove)
+            dimDiv.style.zIndex = "9998";
+            dimDiv.addEventListener("click", this.backgroundDim.remove);
         },
-        remove () {
-            this.dim = false
+
+        remove: () => {
+            this.dim = false;
             console.log("REMOVE DIM");
             const dimDiv = document.getElementById("dim");
-            dimDiv.remove();
-            Prompt.isOpen = false
-            promptDropDown.style.width = this.isOpen?"70%":"0px";
-            promptDropDown.style.top = this.isOpen?"15%":"0px";
-            promptDropDown.style.left = this.isOpen?"15%":"0px";
+            if (dimDiv) {
+                dimDiv.remove();
+            }
+            this.isOpen = false;
+            document.getElementById("promptTitle").style.display = "none";
+            const promptDropDown = document.getElementById("promptDropDown");
+            promptDropDown.style.width = "0"; 
+            promptDropDown.style.top = "0";  
+            promptDropDown.style.left = "-100%"; 
+            promptDropDown.style.transition = "all 0.3s ease-in-out";
         },
-    },
+        
+    };
 
-    createPromptDisplayTable() {
+    createDisplayTable() {
         const table = document.createElement("table");
         table.className = "table prompt";
     
@@ -37,24 +49,21 @@ const Prompt = {
         const header = document.createElement("tr");
         const th = document.createElement("th");
         th.colSpan = 2;
-        th.innerText = "Answer the Questions Below:";
+        th.innerText = "Answer the Questions.";
         header.appendChild(th);
         table.appendChild(header);
     
         return table;
-    },
-    
-    
+    }
 
     toggleDetails() {
-        Prompt.detailed = !Prompt.detailed
+        this.detailed = !this.detailed;
+        this.updateDisplay();
+    }
 
-        Prompt.updatePromptDisplay()
-    },
-
-    updatePromptTable() {
-        const table = this.createPromptDisplayTable();
-        // Use `currentNpc` to populate questions
+    updateTable() {
+        const table = this.createDisplayTable();
+        // Use `this.currentNpc` to populate questions
         if (this.currentNpc && this.currentNpc.questions) {
             this.currentNpc.questions.forEach((question, index) => {
                 const row = document.createElement("tr");
@@ -99,7 +108,8 @@ const Prompt = {
         container.style.padding = "10px"; // Optional: add some padding
         container.appendChild(table);
         return container;
-    },
+    }
+
     handleSubmit() {
         // Collect all answers
         const inputs = document.querySelectorAll("input[type='text']");
@@ -108,113 +118,96 @@ const Prompt = {
             answer: input.value.trim()
         }));
         console.log("Submitted Answers:", answers);
+    
         // Handle the submission logic (e.g., save answers, validate, etc.)
-        alert("Your answers have been submitted!");
-        Prompt.isOpen = false;
-        Prompt.backgroundDim.remove();
-    },
+        alert("Those were definitely some answers. I will go check them now.");
     
+        // Close the prompt and go back to the main level
+        this.isOpen = false;
+        this.backgroundDim.remove();
+    }
     
-    updatePromptDisplay () {
-        const table = document.getElementsByClassName("table scores")[0]
-        const detailToggleSection = document.getElementById("detail-toggle-section")
-        const clearButtonRow = document.getElementById("clear-button-row")
-        const pagingButtonsRow = document.getElementById("paging-buttons-row")
+
+    updateDisplay() {
+        const table = document.getElementsByClassName("table scores")[0];
+        const detailToggleSection = document.getElementById("detail-toggle-section");
+        const clearButtonRow = document.getElementById("clear-button-row");
+        const pagingButtonsRow = document.getElementById("paging-buttons-row");
 
         if (detailToggleSection) {
-            detailToggleSection.remove()
+            detailToggleSection.remove();
         }
 
         if (table) {
-            table.remove() //remove old table if it is there
+            table.remove(); //remove old table if it is there
         }
 
         if (pagingButtonsRow) {
-            pagingButtonsRow.remove()
+            pagingButtonsRow.remove();
         }
 
         if (clearButtonRow) {
-            clearButtonRow.remove()
+            clearButtonRow.remove();
         }
 
-        
-        document.getElementById("promptDropDown").append(Prompt.updatePromptTable()) //update new Prompt
-        
-        
-    },
+        document.getElementById("promptDropDown").append(this.updateTable()); //update new 
+    }
 
-    backPage () {
-        const table = document.getElementsByClassName("table scores")[0]
-
-        if (Prompt.currentPage - 1 == 0) {
+    backPage() {
+        if (this.currentPage - 1 === 0) {
             return;
         }
-    
 
-        Prompt.currentPage -= 1
+        this.currentPage -= 1;
+        this.updateDisplay();
+    }
 
-        Prompt.updatePromptDisplay()
-    },
-    
-    frontPage () {
-        Prompt.currentPage += 1
-        Prompt.updatePromptDisplay()
-        
-    },
+    frontPage() {
+        this.currentPage += 1;
+        this.updateDisplay();
+    }
 
-    openPromptPanel(npc) {
+    openPanel(npc) {
         const promptDropDown = document.querySelector('.promptDropDown');
         const promptTitle = document.getElementById("promptTitle");
-    
-        this.currentNpc = npc; // Assign the current NPC when opening the panel
-        console.log(promptTitle)
-        promptTitle.innerHTML = npc.quiz || "Questions";
-    
-        // Toggle `isOpen` state
-        this.isOpen = true;
-    
-        // Handle the prompt drop-down visibility
+
+        // Close any existing prompt before opening a new one
         if (this.isOpen) {
-            Prompt.backgroundDim.create();
-    
-            // Remove old table if it exists
-            const table = document.getElementsByClassName("table scores")[0];
-            if (table) {
-                table.remove(); 
-            }
-    
-            // Update the prompt display with questions
-            Prompt.updatePromptDisplay();
-    
-            // Style the prompt drop-down
-            promptDropDown.style.position = "fixed";
-            promptDropDown.style.zIndex = "9999";
-            promptDropDown.style.width = "70%";
-            promptDropDown.style.top = "15%";
-            promptDropDown.style.left = "15%";
-            promptDropDown.style.transition = "all 0.3s ease-in-out";
+            this.backgroundDim.remove(); // Ensures previous dim is removed
         }
-    },
 
-    
+        this.currentNpc = npc; // Assign the current NPC when opening the panel
+        this.isOpen = true;
 
-    initializePrompt () {
+        // Ensure the previous content inside promptDropDown is removed
+        promptDropDown.innerHTML = ""; 
+
+        promptTitle.style.display = "block";
+
+        // Add the new title
+        promptTitle.innerHTML = npc?.title || "Questions";
+        promptDropDown.appendChild(promptTitle);
+
+        // Display the new questions
+        promptDropDown.appendChild(this.updateTable());
+
+        // Handle the background dim effect
+        this.backgroundDim.create();
+
+        promptDropDown.style.position = "fixed";
+        promptDropDown.style.zIndex = "9999";
+        promptDropDown.style.width = "70%"; 
+        promptDropDown.style.top = "15%";
+        promptDropDown.style.left = "15%"; 
+        promptDropDown.style.transition = "all 0.3s ease-in-out"; 
+    }
+
+    initialize() {
         const promptTitle = document.createElement("div");
         promptTitle.id = "promptTitle";
         document.getElementById("promptDropDown").appendChild(promptTitle);
-        // document.getElementById("promptDropDown").append(this.updatePromptTable())
-
-       // document.getElementById("prompt-button").addEventListener("click",Prompt.openPromptPanel)
-       console.log("INITIALIZE PROMPT")
-    },
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
     }
-};
 
-export default Prompt;
+}
+
+export default Quiz;

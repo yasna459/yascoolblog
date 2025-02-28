@@ -1,139 +1,269 @@
 import GameObject from './GameObject.js';
 
+// Define non-mutable constants as defaults
+const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
+const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
+const ANIMATION_RATE = 1; // 1/nth of the frame rate
+const INIT_POSITION = { x: 0, y: 0 };
+
 /**
- * Character class extends GameObject and serves as a base class for all character objects.
+ * Character is a dynamic class that manages the data and events for objects like player and NPCs.
  * 
- * This class provides common properties and methods for characters, such as velocity.
+ * The focus of this class is to handle the object's state, rendering, and key events.
  * 
- * @class Character
+ * This class uses a classic Java class pattern which is nice for managing object data and events.
+ * 
+ * The classic Java class pattern provides a structured way to define the properties and methods
+ * associated with the object. This approach helps encapsulate the object's state and behavior,
+ * making the code more modular and easier to maintain. By using this pattern, we can create
+ * multiple instances of the Player class, each with its own state and behavior.
+ * 
+ * @property {Object} position - The current position of the object.
+ * @property {Object} velocity - The current velocity of the object.
+ * @property {Object} scale - The scale of the object based on the game environment.
+ * @property {number} size - The size of the object.
+ * @property {number} width - The width of the object.
+ * @property {number} height - The height of the object.
+ * @property {number} xVelocity - The velocity of the object along the x-axis.
+ * @property {number} yVelocity - The velocity of the object along the y-axis.
+ * @property {Image} spriteSheet - The sprite sheet image for the object.
+ * @property {number} frameIndex - The current frame index for animation.
+ * @property {number} frameCount - The total number of frames for each direction.
+ * @property {Object} spriteData - The data for the sprite sheet.
+ * @property {number} frameCounter - Counter to control the animation rate.
+ * @method draw - Draws the object on the canvas.
+ * @method update - Updates the object's position and ensures it stays within the canvas boundaries.
+ * @method resize - Resizes the object based on the game environment.
+ * @method destroy - Removes the object from the game environment.    
  */
 class Character extends GameObject {
     /**
-     * Constructor for the Character class.
+     * The constructor method is called when a new Player object is created.
      * 
-     * @param {Object} data - The data object for character initialization.
+     * @param {Object|null} data - The sprite data for the object. If null, a default red square is used.
      */
-    constructor(data) {
-        super(data);
-        this.velocity = { x: 0, y: 0 };
-        this.position = data.INIT_POSITION || { x: 0, y: 0 }; // Initialize position
-        this.currentFrame = 0;
-        this.frameCount = 0;
-        this.bindEventListeners();
-        this.loadSprite();
-    }
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.data = data;
+        this.state = {
+            ...this.state,
+            animation: 'idle',
+            direction: 'right',
+            isDying: false,
+            isFinishing: false,
+        }; // Object control data
 
-    /**
-     * Binds key event listeners to handle object movement.
-     */
-    bindEventListeners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
-    }
+        // Create canvas element
+        this.canvas = document.createElement("canvas");
+        this.canvas.id = data.id || "default";
+        this.canvas.width = data.pixels?.width || 0;
+        this.canvas.height = data.pixels?.height || 0;
+        this.hitbox = data?.hitbox || {};
+        this.ctx = this.canvas.getContext('2d');
+        document.getElementById("gameContainer").appendChild(this.canvas);
 
-    /**
-     * Handles key down events to change the object's velocity.
-     * 
-     * @param {Object} event - The keydown event.
-     */
-    handleKeyDown(event) {
-        switch (event.keyCode) {
-            case this.keypress.up:
-                this.velocity.y = -this.STEP_FACTOR;
-                break;
-            case this.keypress.down:
-                this.velocity.y = this.STEP_FACTOR;
-                break;
-            case this.keypress.left:
-                this.velocity.x = -this.STEP_FACTOR;
-                break;
-            case this.keypress.right:
-                this.velocity.x = this.STEP_FACTOR;
-                break;
-        }
-    }
+        // Set initial object properties 
+        this.x = 0;
+        this.y = 0;
+        this.frame = 0;
+        
+        // Initialize the object's scale based on the game environment
+        this.scale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
+        
+        // Check if sprite data is provided
+        if (data && data.src) {
+            this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
+            this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
+            this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
+            this.position = data.INIT_POSITION || INIT_POSITION;
+    
+            // Load the sprite sheet
+            this.spriteSheet = new Image();
+            this.spriteSheet.src = data.src;
 
-    /**
-     * Handles key up events to stop the object's velocity.
-     * 
-     * @param {Object} event - The keyup event.
-     */
-    handleKeyUp(event) {
-        switch (event.keyCode) {
-            case this.keypress.up:
-            case this.keypress.down:
-                this.velocity.y = 0;
-                break;
-            case this.keypress.left:
-            case this.keypress.right:
-                this.velocity.x = 0;
-                break;
-        }
-    }
-
-    /**
-     * Loads the sprite for the character.
-     */
-    loadSprite() {
-        // Implement sprite loading logic here
-    }
-
-    /**
-     * Draws the character on the canvas.
-     */
-    draw() {
-        const ctx = GameEnv.ctx;
-        const { x, y } = this.position;
-        const { width, height } = this.pixels;
-
-        if (this.image) {
-            ctx.drawImage(
-                this.image,
-                this.currentFrame * width,
-                0,
-                width,
-                height,
-                x,
-                y,
-                width * this.SCALE_FACTOR,
-                height * this.SCALE_FACTOR
-            );
+            // Initialize animation properties
+            this.frameIndex = 0; // index reference to current frame
+            this.frameCounter = 0; // count each frame rate refresh
+            this.direction = 'down'; // Initial direction
+            this.spriteData = data;
         } else {
-            ctx.fillStyle = 'red';
-            ctx.fillRect(x, y, width * this.SCALE_FACTOR, height * this.SCALE_FACTOR);
+            throw new Error('Sprite data is required');
         }
+
+        // Initialize the object's position and velocity
+        this.velocity = { x: 0, y: 0 };
+
+        // Set the initial size and velocity of the object
+        this.resize();
+
     }
 
+
     /**
-     * Updates the character's state.
+     * Manages the object's look, state, and movement. 
+     * 
      */
     update() {
+        this.draw();
+        this.collisionChecks();
+        this.move();
+    }
+
+
+    /**
+     * Draws the object on the canvas.
+     * 
+     * This method renders the object using the sprite sheet if provided, otherwise a red square.
+     */
+    draw() {
+        if (this.spriteSheet) {
+            // Sprite Sheet frame size: pixels = total pixels / total frames
+            const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
+            const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
+    
+            // Sprite Sheet direction data source (e.g., front, left, right, back)
+            const directionData = this.spriteData[this.direction];
+    
+            // Sprite Sheet x and y declarations to store coordinates of current frame
+            let frameX, frameY;
+            // Sprite Sheet x and y current frame: coordinate = (index) * (pixels)
+            frameX = (directionData.start + this.frameIndex) * frameWidth;
+            frameY = directionData.row * frameHeight;
+    
+            // Set up the canvas dimensions and styles
+            this.canvas.width = frameWidth;
+            this.canvas.height = frameHeight;
+            this.canvas.style.width = `${this.width}px`;
+            this.canvas.style.height = `${this.height}px`;
+            this.canvas.style.position = 'absolute';
+            this.canvas.style.left = `${this.position.x}px`;
+            this.canvas.style.top = `${this.gameEnv.top+this.position.y}px`;
+    
+            // Clear the canvas before drawing
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+   
+            // Apply transformations for rotation and mirroring
+            if (directionData.rotate || directionData.mirror || directionData.spin) {
+                // Translate to the context to the center of the sprite
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+                // Apply rotation transformation
+                if (directionData.rotate) {
+                    this.ctx.rotate(directionData.rotate);
+                }
+                // Apply mirror transformation
+                if (directionData.mirror) {
+                    this.ctx.scale(-1, 1); // Flip horizontally
+                }
+                if (directionData.spin) {
+                    this.ctx.rotate(Math.PI / Math.floor(Math.random() * directionData.spin + 1));
+                }
+                // Translate the context back to the upper left corner
+                this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+            }
+
+            if (directionData.explode) {
+                this.ctx.filter = 'grayscale(50%) blur(5px)';
+            }   
+
+            // Draw the current frame of the sprite sheet
+            this.ctx.drawImage(
+                this.spriteSheet,
+                frameX, frameY, frameWidth, frameHeight, // Source rectangle
+                0, 0, this.canvas.width, this.canvas.height // Destination rectangle
+            );
+            
+    
+            // Update the frame index for animation at a slower rate
+            this.frameCounter++;
+            if (this.frameCounter % this.animationRate === 0) {
+                this.frameIndex = (this.frameIndex + 1) % directionData.columns;
+            }
+        } else {
+            // Draw default red square
+            this.ctx.fillStyle = 'red';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+
+    /**
+     * Move the object and ensures it stays within the canvas boundaries.
+     * 
+     * This method changes the object's position based on its velocity and ensures that the object
+     * stays within the boundaries of the canvas.
+     */
+    move() {
+        // Update or change position according to velocity events
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
-        this.frameCount++;
-        if (this.frameCount >= this.ANIMATION_RATE) {
-            this.currentFrame = (this.currentFrame + 1) % this.orientation.columns;
-            this.frameCount = 0;
+
+        // Ensure the object stays within the canvas boundaries
+        // Bottom of the canvas
+        if (this.position.y + this.height > this.gameEnv.innerHeight) {
+            this.position.y = this.gameEnv.innerHeight - this.height;
+            this.velocity.y = 0;
         }
-        this.draw();
+        // Top of the canvas
+        if (this.position.y < 0) {
+            this.position.y = 0;
+            this.velocity.y = 0;
+        }
+        // Right of the canvas
+        if (this.position.x + this.width > this.gameEnv.innerWidth) {
+            this.position.x = this.gameEnv.innerWidth - this.width;
+            this.velocity.x = 0;
+        }
+        // Left of the canvas
+        if (this.position.x < 0) {
+            this.position.x = 0;
+            this.velocity.x = 0;
+        }
     }
+    
 
     /**
-     * Resizes the character based on the canvas size.
+     * Resizes the object based on the game environment.
+     * 
+     * This method adjusts the object's size and velocity based on the scale of the game environment.
+     * It also adjusts the object's position proportionally based on the previous and current scale.
      */
     resize() {
-        this.draw();
-    }
+        // Calculate the new scale resulting from the window resize
+        const newScale = { width: this.gameEnv.innerWidth, height: this.gameEnv.innerHeight };
 
-    /**
-     * Destroys the character and removes it from the game environment.
+        // Adjust the object's position proportionally
+        this.position.x = (this.position.x / this.scale.width) * newScale.width;
+        this.position.y = (this.position.y / this.scale.height) * newScale.height;
+
+        // Update the object's scale to the new scale
+        this.scale = newScale;
+
+        // Recalculate the object's size based on the new scale
+        this.size = this.scale.height / this.scaleFactor; 
+
+        // Recalculate the object's velocity steps based on the new scale
+        this.xVelocity = this.scale.width / this.stepFactor;
+        this.yVelocity = this.scale.height / this.stepFactor;
+
+        // Set the object's width and height to the new size (object is a square)
+        this.width = this.size;
+        this.height = this.size;
+    }
+    
+
+    /* Destroy Game Object
+     * remove canvas element of object
+     * remove object from this.gameEnv.gameObjects array
      */
     destroy() {
-        const index = GameEnv.gameObjects.indexOf(this);
+        const index = this.gameEnv.gameObjects.indexOf(this);
         if (index !== -1) {
-            GameEnv.gameObjects.splice(index, 1);
+            // Remove the canvas from the DOM
+            this.canvas.parentNode.removeChild(this.canvas);
+            this.gameEnv.gameObjects.splice(index, 1);
         }
     }
+    
 }
 
 export default Character;

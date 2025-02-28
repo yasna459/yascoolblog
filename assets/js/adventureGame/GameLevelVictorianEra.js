@@ -3,7 +3,7 @@ import Background from './Background.js';
 import Player from './Player.js';
 import Npc from './Npc.js';
 import Enemy from './Enemy.js';
-import Guard from './Guard.js';
+
 
 /**
  * GameLevelVictorianEra class manages the Victorian Era level.

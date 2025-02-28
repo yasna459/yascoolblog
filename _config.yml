@@ -14,7 +14,7 @@ header_pages:
   - navigation/search.md
   - navigation/about.md
   - navigation/game.md
-  - navigation/adventureGame.md
+  - navigation/gamify/adventureGame.md
 
 head:
   - "<link rel='stylesheet' href='/_sass/jekyll-theme-cayman.scss'>"
