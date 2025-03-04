@@ -166,22 +166,21 @@ class Quiz {
         title.innerText = quizData.title;
         quizPopup.appendChild(title);
 
-        quizData.questions.forEach((question, index) => {
+        quizData.questions.forEach((questionData, index) => {
             const questionDiv = document.createElement("div");
             questionDiv.style.marginBottom = "15px";
 
             const questionText = document.createElement("p");
-            questionText.innerText = `${index + 1}. ${question}`;
+            questionText.innerText = `${index + 1}. ${questionData.question}`;
             questionDiv.appendChild(questionText);
 
-            const options = question.split("\n").slice(1); // Assuming options are on new lines
-            options.forEach((option, optionIndex) => {
+            questionData.options.forEach((option, optionIndex) => {
                 const optionLabel = document.createElement("label");
 
                 const optionInput = document.createElement("input");
                 optionInput.type = "radio";
                 optionInput.name = `question${index}`;
-                optionInput.value = optionIndex + 1;
+                optionInput.value = optionIndex;
 
                 optionLabel.appendChild(optionInput);
                 optionLabel.appendChild(document.createTextNode(option));
@@ -211,12 +210,11 @@ class Quiz {
         const userAnswers = [];
         let correctAnswers = 0;
 
-        quizData.questions.forEach((question, index) => {
+        quizData.questions.forEach((questionData, index) => {
             const selectedOption = quizPopup.querySelector(`input[name="question${index}"]:checked`);
             if (selectedOption) {
-                userAnswers.push(selectedOption.value);
-                // Assuming the correct answer is always the first option (value = 1)
-                if (selectedOption.value == 1) {
+                userAnswers.push(parseInt(selectedOption.value));
+                if (parseInt(selectedOption.value) === questionData.correctAnswer) {
                     correctAnswers++;
                 }
             } else {

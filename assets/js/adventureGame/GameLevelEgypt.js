@@ -97,6 +97,86 @@ class GameLevelEgypt {
     console.log("Rat Guide Data:", sprite_data_guide);
     console.log("Rat Guide Position:", sprite_data_guide.INIT_POSITION.x, sprite_data_guide.INIT_POSITION.y);
 
+    // Quiz data
+    const quizData = {
+      title: "Ancient Egypt Quiz",
+      questions: [
+        {
+          question: "Who was the first pharaoh of Egypt?",
+          options: ["Narmer", "Ramses II", "Tutankhamun", "Cleopatra"],
+          correctAnswer: 0
+        },
+        {
+          question: "What is the name of the ancient Egyptian writing system?",
+          options: ["Hieroglyphics", "Cuneiform", "Latin", "Greek"],
+          correctAnswer: 0
+        },
+        {
+          question: "Which river was crucial to the development of ancient Egyptian civilization?",
+          options: ["Nile", "Amazon", "Tigris", "Euphrates"],
+          correctAnswer: 0
+        },
+        {
+          question: "What structure is the Great Pyramid of Giza?",
+          options: ["Tomb", "Temple", "Palace", "Fortress"],
+          correctAnswer: 0
+        },
+        {
+          question: "Who was the Egyptian god of the afterlife?",
+          options: ["Osiris", "Ra", "Anubis", "Horus"],
+          correctAnswer: 0
+        },
+        {
+          question: "What was the primary material used in ancient Egyptian construction?",
+          options: ["Stone", "Wood", "Brick", "Metal"],
+          correctAnswer: 0
+        },
+        {
+          question: "Which queen was known for her beauty and political acumen?",
+          options: ["Cleopatra", "Nefertiti", "Hatshepsut", "Isis"],
+          correctAnswer: 0
+        },
+        {
+          question: "What was the purpose of the Sphinx?",
+          options: ["Guardian of the Giza Plateau", "Temple", "Palace", "Fortress"],
+          correctAnswer: 0
+        },
+        {
+          question: "Which pharaoh's tomb was discovered intact in 1922?",
+          options: ["Tutankhamun", "Ramses II", "Akhenaten", "Hatshepsut"],
+          correctAnswer: 0
+        },
+        {
+          question: "What was the primary purpose of the pyramids?",
+          options: ["Tombs for pharaohs", "Temples", "Palaces", "Fortresses"],
+          correctAnswer: 0
+        }
+      ]
+    };
+
+    
+    // Shuffle the answers and update the correct answers
+    function shuffleAnswers(quizData) {
+      quizData.questions.forEach(question => {
+        const correctAnswer = question.options[question.correctAnswer];
+        const shuffledOptions = question.options
+          .map(option => ({ option, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map(({ option }) => option);
+        question.correctAnswer = shuffledOptions.indexOf(correctAnswer);
+        question.options = shuffledOptions;
+      });
+    }
+
+    // Shuffle the questions and answers
+    function shuffleQuestionsAndAnswers(quizData) {
+      quizData.questions = quizData.questions
+        .map(question => ({ question, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ question }) => question);
+      shuffleAnswers(quizData);
+    }
+
     // NPC data for Pyramid Guard 
     const sprite_src_pyramidguard = path + "/images/gamify/pyramid_guard.png"; // be sure to include the path
     const sprite_greet_pyramidguard = "I am the guardian of the pyramid. Wait--you don't look like you're from around here. I'll have to quiz you! Press 'E' to start the quiz.";
@@ -111,32 +191,17 @@ class GameLevelEgypt {
         orientation: {rows: 1, columns: 1 },
         down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-        // Ancient egypt quiz
-        quiz: { 
-          title: "Ancient Egypt Quiz",
-          questions: [
-            "Who was the first pharaoh of Egypt?\n1. Narmer\n2. Ramses II\n3. Tutankhamun\n4. Cleopatra",
-            "What is the name of the ancient Egyptian writing system?\n1. Hieroglyphics\n2. Cuneiform\n3. Latin\n4. Greek",
-            "Which river was crucial to the development of ancient Egyptian civilization?\n1. Nile\n2. Amazon\n3. Tigris\n4. Euphrates",
-            "What structure is the Great Pyramid of Giza?\n1. Tomb\n2. Temple\n3. Palace\n4. Fortress",
-            "Who was the Egyptian god of the afterlife?\n1. Osiris\n2. Ra\n3. Anubis\n4. Horus",
-            "What was the primary material used in ancient Egyptian construction?\n1. Stone\n2. Wood\n3. Brick\n4. Metal",
-            "Which queen was known for her beauty and political acumen?\n1. Cleopatra\n2. Nefertiti\n3. Hatshepsut\n4. Isis",
-            "What was the purpose of the Sphinx?\n1. Guardian of the Giza Plateau\n2. Temple\n3. Palace\n4. Fortress",
-            "Which pharaoh's tomb was discovered intact in 1922?\n1. Tutankhamun\n2. Ramses II\n3. Akhenaten\n4. Hatshepsut",
-            "What was the primary purpose of the pyramids?\n1. Tombs for pharaohs\n2. Temples\n3. Palaces\n4. Fortresses" 
-          ] 
-        },
+        quiz: quizData,
         reaction: function() {
           alert(sprite_greet_pyramidguard);
         },
         interact: function() {
+          shuffleQuestionsAndAnswers(sprite_data_pyramidguard.quiz);
           let quiz = new Quiz(); // Create a new Quiz instance
           quiz.initialize();
           quiz.openPanel(sprite_data_pyramidguard.quiz);
-          }
-    
-      };
+        }
+    };
 
       const sprite_src_tombguard = path + "/images/gamify/tomb_guard.png";
       const sprite_greet_tombguard = [
