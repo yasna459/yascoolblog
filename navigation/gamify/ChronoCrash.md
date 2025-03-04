@@ -1,7 +1,7 @@
 ---
 layout: base
-title: Adventure Game
-permalink: /gamify/adventureGame
+title: Chrono - Crash
+permalink: /gamify/ChronoCrash
 ---
 
 <div id="gameContainer">

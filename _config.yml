@@ -14,7 +14,8 @@ header_pages:
   - navigation/search.md
   - navigation/about.md
   - navigation/game.md
-  - navigation/gamify/adventureGame.md
+  - navigation/gamify/ChronoCrash.md
+  
 
 head:
   - "<link rel='stylesheet' href='/_sass/jekyll-theme-cayman.scss'>"

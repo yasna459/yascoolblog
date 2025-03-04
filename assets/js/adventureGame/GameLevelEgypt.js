@@ -31,8 +31,8 @@ class GameLevelEgypt {
         greeting: "I'm you! And I'm definitely not in the right era...",
         src: sprite_src_tourist,
         SCALE_FACTOR: TOURIST_SCALE_FACTOR,
-        STEP_FACTOR: 1000,
-        ANIMATION_RATE: 50,
+        STEP_FACTOR: 100,
+        ANIMATION_RATE: 25,
         INIT_POSITION: { x: 0, y: height - (height/TOURIST_SCALE_FACTOR) }, 
         pixels: {height: 320, width: 120},
         orientation: {rows: 4, columns: 3 },
@@ -184,6 +184,7 @@ class GameLevelEgypt {
         id: 'Pyramid Guard',
         greeting: sprite_greet_pyramidguard,
         src: sprite_src_pyramidguard,
+        STEP_FACTOR: 1000,
         SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
         ANIMATION_RATE: 50,
         pixels: {height: 120, width: 63},
