@@ -1,213 +1,254 @@
 import gameControlInstance from "./GameControl.js";
+
 class Quiz {
     constructor() {
         this.isOpen = false;
         this.dim = false;
         this.currentNpc = null;
         this.currentPage = 0;
+        this.userAnswers = [];
+        this.injectStyles(); // Inject CSS styles dynamically
+    }
+
+    // Inject CSS styles directly into the document
+    injectStyles() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            /* Egyptian themed font */
+            @import url('https://fonts.googleapis.com/css2?family=Papyrus&display=swap');
+
+            /* Background dimming */
+            #dim {
+                background-color: rgba(0, 0, 0, 0.8);
+                width: 100%;
+                height: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 9998;
+            }
+
+            /* Quiz popup styling */
+            .quiz-popup {
+                position: fixed;
+                width: 80%;
+                max-width: 800px;
+                top: 10%;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 9999;
+                max-height: 80vh;
+                overflow-y: auto;
+                background-color: #f5deb3; /* Wheat color */
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                font-family: 'Papyrus', sans-serif;
+                border: 2px solid #8b4513; /* SaddleBrown color */
+                color: #8b4513; /* SaddleBrown color */
+            }
+
+            /* Quiz title styling */
+            .quiz-popup h2 {
+                color: #8b4513; /* SaddleBrown color */
+                text-align: center;
+            }
+
+            /* Question styling */
+            .quiz-popup p {
+                color: #8b4513; /* SaddleBrown color */
+            }
+
+            /* Option styling */
+            .quiz-popup label {
+                display: block;
+                margin-bottom: 10px;
+                color: #8b4513; /* SaddleBrown color */
+            }
+
+            /* Input field styling */
+            .quiz-input {
+                width: 95%;
+                padding: 8px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                background: #faf2d0;
+                border-radius: 5px;
+                font-size: 16px;
+                margin-top: 5px;
+                font-family: 'Papyrus', sans-serif;
+                transition: all 0.2s ease-in-out;
+            }
+            .quiz-input:focus {
+                outline: none;
+                border: 2px solid #8b4513;
+                box-shadow: 0 0 8px rgba(139, 69, 19, 0.6);
+                background: #fff8d0;
+            }
+
+            /* Submit button styling */
+            .quiz-submit {
+                background-color: #8b4513; /* SaddleBrown color */
+                color: #ffffff;
+                border: none;
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-top: 20px;
+                transition: 0.3s ease-in-out;
+            }
+
+            .quiz-submit:hover {
+                background-color: #a0522d; /* Sienna color */
+            }
+
+            /* Close button styling */
+            .close-button {
+                background-color: #b22222; /* FireBrick color */
+                margin-left: 10px;
+            }
+
+            .close-button:hover {
+                background-color: #cd5c5c; /* IndianRed color */
+            }
+
+            /* Score sheet styling */
+            .score-sheet {
+                background-color: #f5deb3; /* Wheat color */
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                font-family: 'Papyrus', sans-serif;
+                border: 2px solid #8b4513; /* SaddleBrown color */
+                color: #8b4513; /* SaddleBrown color */
+                text-align: center;
+                margin-top: 20px;
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     backgroundDim = {
         create: () => {
             this.dim = true;
-            console.log("CREATE DIM");
             const dimDiv = document.createElement("div");
             dimDiv.id = "dim";
-            dimDiv.style.backgroundColor = "black";
-            dimDiv.style.width = "100%";
-            dimDiv.style.height = "100%";
-            dimDiv.style.position = "absolute";
-            dimDiv.style.opacity = "0.8";
             document.body.append(dimDiv);
-            dimDiv.style.zIndex = "9998";
             dimDiv.addEventListener("click", this.backgroundDim.remove);
         },
 
         remove: () => {
             this.dim = false;
-            console.log("REMOVE DIM");
             const dimDiv = document.getElementById("dim");
             if (dimDiv) {
                 dimDiv.remove();
             }
             this.isOpen = false;
-            document.getElementById("promptTitle").style.display = "none";
-            const promptDropDown = document.getElementById("promptDropDown");
-            promptDropDown.style.width = "0"; 
-            promptDropDown.style.top = "0";  
-            promptDropDown.style.left = "-100%"; 
-            promptDropDown.style.transition = "all 0.3s ease-in-out";
-        },
-        
+            const quizPopup = document.querySelector(".quiz-popup");
+            if (quizPopup) {
+                quizPopup.remove();
+            }
+        }
     };
 
-    createDisplayTable() {
-        const table = document.createElement("table");
-        table.className = "table prompt";
-    
-        // Header row for questions
-        const header = document.createElement("tr");
-        const th = document.createElement("th");
-        th.colSpan = 2;
-        th.innerText = "Answer the Questions.";
-        header.appendChild(th);
-        table.appendChild(header);
-    
-        return table;
-    }
-
-    toggleDetails() {
-        this.detailed = !this.detailed;
-        this.updateDisplay();
-    }
-
-    updateTable() {
-        const table = this.createDisplayTable();
-        // Use `this.currentNpc` to populate questions
-        if (this.currentNpc && this.currentNpc.questions) {
-            this.currentNpc.questions.forEach((question, index) => {
-                const row = document.createElement("tr");
-                // Question cell
-                const questionCell = document.createElement("td");
-                questionCell.innerText = `${index + 1}. ${question}`;
-                row.appendChild(questionCell);
-                // Input cell
-                const inputCell = document.createElement("td");
-                const input = document.createElement("input");
-                input.type = "text";
-                input.placeholder = "Your answer here...";
-                input.dataset.questionIndex = index; // Tag input with the question index
-                inputCell.appendChild(input);
-                row.appendChild(inputCell);
-                table.appendChild(row);
-            });
-            // Add submit button
-            const submitRow = document.createElement("tr");
-            const submitCell = document.createElement("td");
-            submitCell.colSpan = 2;
-            submitCell.style.textAlign = "center";
-            const submitButton = document.createElement("button");
-            submitButton.innerText = "Submit";
-            submitButton.addEventListener("click", this.handleSubmit.bind(this)); // Attach submission handler
-            submitCell.appendChild(submitButton);
-            submitRow.appendChild(submitCell);
-            table.appendChild(submitRow);
-        } else {
-            const row = document.createElement("tr");
-            const noQuestionsCell = document.createElement("td");
-            noQuestionsCell.colSpan = 2;
-            noQuestionsCell.innerText = "No questions available.";
-            row.appendChild(noQuestionsCell);
-            table.appendChild(row);
-        }
-        // Wrap the table in a scrollable container
-        const container = document.createElement("div");
-        container.style.maxHeight = "400px"; // Limit height for scrollability
-        container.style.overflowY = "auto"; // Enable vertical scrolling
-        container.style.border = "1px solid #ccc"; // Optional: add a border
-        container.style.padding = "10px"; // Optional: add some padding
-        container.appendChild(table);
-        return container;
-    }
-
-    handleSubmit() {
-        // Collect all answers
-        const inputs = document.querySelectorAll("input[type='text']");
-        const answers = Array.from(inputs).map(input => ({
-            questionIndex: input.dataset.questionIndex,
-            answer: input.value.trim()
-        }));
-        console.log("Submitted Answers:", answers);
-    
-        // Handle the submission logic (e.g., save answers, validate, etc.)
-        alert("Those were definitely some answers. I will go check them now.");
-    
-        // Close the prompt and go back to the main level
-        this.isOpen = false;
-        this.backgroundDim.remove();
-    }
-    
-
-    updateDisplay() {
-        const table = document.getElementsByClassName("table scores")[0];
-        const detailToggleSection = document.getElementById("detail-toggle-section");
-        const clearButtonRow = document.getElementById("clear-button-row");
-        const pagingButtonsRow = document.getElementById("paging-buttons-row");
-
-        if (detailToggleSection) {
-            detailToggleSection.remove();
-        }
-
-        if (table) {
-            table.remove(); //remove old table if it is there
-        }
-
-        if (pagingButtonsRow) {
-            pagingButtonsRow.remove();
-        }
-
-        if (clearButtonRow) {
-            clearButtonRow.remove();
-        }
-
-        document.getElementById("promptDropDown").append(this.updateTable()); //update new 
-    }
-
-    backPage() {
-        if (this.currentPage - 1 === 0) {
-            return;
-        }
-
-        this.currentPage -= 1;
-        this.updateDisplay();
-    }
-
-    frontPage() {
-        this.currentPage += 1;
-        this.updateDisplay();
-    }
-
-    openPanel(npc) {
-        const promptDropDown = document.querySelector('.promptDropDown');
-        const promptTitle = document.getElementById("promptTitle");
-
-        // Close any existing prompt before opening a new one
-        if (this.isOpen) {
-            this.backgroundDim.remove(); // Ensures previous dim is removed
-        }
-
-        this.currentNpc = npc; // Assign the current NPC when opening the panel
-        this.isOpen = true;
-
-        // Ensure the previous content inside promptDropDown is removed
-        promptDropDown.innerHTML = ""; 
-
-        promptTitle.style.display = "block";
-
-        // Add the new title
-        promptTitle.innerHTML = npc?.title || "Questions";
-        promptDropDown.appendChild(promptTitle);
-
-        // Display the new questions
-        promptDropDown.appendChild(this.updateTable());
-
-        // Handle the background dim effect
-        this.backgroundDim.create();
-
-        promptDropDown.style.position = "fixed";
-        promptDropDown.style.zIndex = "9999";
-        promptDropDown.style.width = "70%"; 
-        promptDropDown.style.top = "15%";
-        promptDropDown.style.left = "15%"; 
-        promptDropDown.style.transition = "all 0.3s ease-in-out"; 
-    }
-
     initialize() {
-        const promptTitle = document.createElement("div");
-        promptTitle.id = "promptTitle";
-        document.getElementById("promptDropDown").appendChild(promptTitle);
+        if (!this.isOpen) {
+            this.backgroundDim.create();
+            this.isOpen = true;
+        }
     }
 
+    openPanel(quizData) {
+        const quizPopup = document.createElement("div");
+        quizPopup.className = "quiz-popup";
+
+        const title = document.createElement("h2");
+        title.innerText = quizData.title;
+        quizPopup.appendChild(title);
+
+        quizData.questions.forEach((question, index) => {
+            const questionDiv = document.createElement("div");
+            questionDiv.style.marginBottom = "15px";
+
+            const questionText = document.createElement("p");
+            questionText.innerText = `${index + 1}. ${question}`;
+            questionDiv.appendChild(questionText);
+
+            const options = question.split("\n").slice(1); // Assuming options are on new lines
+            options.forEach((option, optionIndex) => {
+                const optionLabel = document.createElement("label");
+
+                const optionInput = document.createElement("input");
+                optionInput.type = "radio";
+                optionInput.name = `question${index}`;
+                optionInput.value = optionIndex + 1;
+
+                optionLabel.appendChild(optionInput);
+                optionLabel.appendChild(document.createTextNode(option));
+                questionDiv.appendChild(optionLabel);
+            });
+
+            quizPopup.appendChild(questionDiv);
+        });
+
+        const submitButton = document.createElement("button");
+        submitButton.innerText = "Submit";
+        submitButton.className = "quiz-submit";
+        submitButton.addEventListener("click", () => this.handleSubmit(quizData));
+        quizPopup.appendChild(submitButton);
+
+        const closeButton = document.createElement("button");
+        closeButton.innerText = "Close";
+        closeButton.className = "close-button";
+        closeButton.addEventListener("click", this.backgroundDim.remove);
+        quizPopup.appendChild(closeButton);
+
+        document.body.appendChild(quizPopup);
+    }
+
+    handleSubmit(quizData) {
+        const quizPopup = document.querySelector(".quiz-popup");
+        const userAnswers = [];
+        let correctAnswers = 0;
+
+        quizData.questions.forEach((question, index) => {
+            const selectedOption = quizPopup.querySelector(`input[name="question${index}"]:checked`);
+            if (selectedOption) {
+                userAnswers.push(selectedOption.value);
+                // Assuming the correct answer is always the first option (value = 1)
+                if (selectedOption.value == 1) {
+                    correctAnswers++;
+                }
+            } else {
+                userAnswers.push(null); // No answer selected
+            }
+        });
+
+        console.log("User Answers:", userAnswers);
+        this.userAnswers = userAnswers;
+        this.backgroundDim.remove();
+        this.showScoreSheet(correctAnswers, quizData.questions.length);
+    }
+
+    showScoreSheet(correctAnswers, totalQuestions) {
+        const scoreSheet = document.createElement("div");
+        scoreSheet.className = "score-sheet";
+        scoreSheet.innerHTML = `
+            <h2>Score Sheet</h2>
+            <p>You got ${correctAnswers} out of ${totalQuestions} questions right!</p>
+        `;
+
+        const closeButton = document.createElement("button");
+        closeButton.innerText = "Close";
+        closeButton.className = "close-button";
+        closeButton.addEventListener("click", () => {
+            scoreSheet.remove();
+            this.backgroundDim.remove();
+        });
+        scoreSheet.appendChild(closeButton);
+
+        document.body.appendChild(scoreSheet);
+    }
 }
 
 export default Quiz;

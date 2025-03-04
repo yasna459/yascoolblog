@@ -32,7 +32,7 @@ class GameLevelEgypt {
         src: sprite_src_tourist,
         SCALE_FACTOR: TOURIST_SCALE_FACTOR,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 100,
+        ANIMATION_RATE: 50,
         INIT_POSITION: { x: 0, y: height - (height/TOURIST_SCALE_FACTOR) }, 
         pixels: {height: 320, width: 120},
         orientation: {rows: 4, columns: 3 },
@@ -138,28 +138,31 @@ class GameLevelEgypt {
     
       };
 
-    // NPC Data for Tomb Guard
-    const sprite_src_tombguard = path + "/images/gamify/tomb_guard.png"; // be sure to include the path
-    const sprite_greet_tombguard = "Ah, yes I've heard of you. I am the guardian of this tomb. I don't usually do this, but I'll let you pass just this once. Don't expect it again. Beware of the cat....";
-    const sprite_data_tombguard = {
-      id: 'Tomb Guard',
-      greeting: sprite_greet_tombguard,
-      src: sprite_src_tombguard,
-      SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
-      ANIMATION_RATE: 100,
-      pixels: {width: 63, height: 120},
-      INIT_POSITION: { x: ((width * 1 / 4) + 100), y: ((height * 3 / 4) - 20)}, // Adjusted position
-      orientation: {rows: 1, columns: 1 },
-      down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
-      hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      /* Reaction function
-      *  This function is called when the player interacts with the NPC
-      *  It displays an alert with the greeting message
-      */
-      reaction: function() {
-        alert(sprite_greet_tombguard);
-      },
-    };
+      const sprite_src_tombguard = path + "/images/gamify/tomb_guard.png";
+      const sprite_greet_tombguard = [
+        "Ah, yes I've heard of you. I am the guardian of this tomb. I don't usually do this, but I'll let you pass just this once. Don't expect it again. Beware of the cat....",
+        "You again? I thought I told you to beware of the cat!",
+        "Welcome back, traveler. Remember, the cat is always watching.",
+        "I see you've returned. The cat is still out there, lurking."
+      ];
+      const sprite_data_tombguard = {
+        id: 'Tomb Guard',
+        greetings: sprite_greet_tombguard,
+        src: sprite_src_tombguard,
+        SCALE_FACTOR: 5,
+        ANIMATION_RATE: 100,
+        pixels: { width: 63, height: 120 },
+        INIT_POSITION: { x: ((width * 1 / 4) + 100), y: ((height * 3 / 4) - 20) },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+
+        reaction: () => {
+          const randomGreeting = sprite_data_tombguard.greetings[Math.floor(Math.random() * sprite_data_tombguard.greetings.length)];
+          alert(randomGreeting);
+        }
+      };
+  
     
         // List of objects defnitions for this level
         this.classes = [
