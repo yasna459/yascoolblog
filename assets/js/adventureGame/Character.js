@@ -1,8 +1,8 @@
 import GameObject from './GameObject.js';
 
 // Define non-mutable constants as defaults
-const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
-const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
+const SCALE_FACTOR = 50; // 1/nth of the height of the canvas
+const STEP_FACTOR = 70; // 1/nth, or N steps up and across the canvas
 const ANIMATION_RATE = 1; // 1/nth of the frame rate
 const INIT_POSITION = { x: 0, y: 0 };
 
